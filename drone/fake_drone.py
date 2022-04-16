@@ -1,7 +1,7 @@
-import djitellopy
+import numpy as np
 
 
-class Drone:
+class FakeDrone:
     def __init__(self):
         self.x_speed = 50
         self.y_speed = 50
@@ -12,28 +12,25 @@ class Drone:
         self.z_velocity = 0
         self.yaw_velocity = 0
         self.is_flying = False
-        self.tello = djitellopy.Tello()
-        self.tello.connect()
-        self.tello.streamon()
         print("READY")
 
     def land(self):
         self.is_flying = False
-        self.tello.land()
+        print("LAND")
 
     def takeoff(self):
         self.is_flying = True
-        self.tello.takeoff()
+        print("TAKEOFF")
 
     def flip_left(self):
         if self.is_flying:
             self.stop()
-            self.tello.flip_left()
+            print("FLIP LEFT")
 
     def flip_right(self):
         if self.is_flying:
             self.stop()
-            self.tello.flip_right()
+            print("FLIP RIGHT")
 
     def stop(self):
         self.x_velocity = 0
@@ -44,10 +41,10 @@ class Drone:
 
     def fly(self):
         if self.is_flying:
-            self.tello.send_rc_control(self.x_velocity, self.y_velocity, self.z_velocity, self.yaw_velocity)
+            print("Fly", self.x_velocity, self.y_velocity, self.z_velocity, self.yaw_velocity)
 
     def disconnect(self):
-        self.tello.end()
+        print("DISCONNECT")
 
     def get_frame(self):
-        return self.tello.get_frame_read().frame
+        return np.zeros((320, 240, 3), np.uint8)

@@ -1,8 +1,13 @@
 from drone_commands.flip_left_command import FlipLeftCommand
 from drone_commands.flip_right_command import FlipRightCommand
 from drone_commands.fly_command import FlyCommand
+from drone_commands.fly_square_command import AutoFlySquareCommand
+from drone_commands.fly_to_command import FlyToCommand
+from drone_commands.land_command import LandCommand
+from drone_commands.rotate_command import RotateCommand
 from drone_commands.show_video_command import ShowVideoCommand
 from drone_commands.stop_command import StopCommand
+from drone_commands.takeoff_command import TakeoffCommand
 from drone_commands.toggle_flight_command import ToggleFlightCommand
 
 FlyCommand = FlyCommand
@@ -11,3 +16,8 @@ FlipRightCommand = FlipRightCommand
 StopCommand = StopCommand
 ToggleFlightCommand = ToggleFlightCommand
 ShowVideoCommand = ShowVideoCommand
+FlyToCommand = FlyToCommand
+RotateCommand = RotateCommand
+LandCommand = LandCommand
+TakeoffCommand = TakeoffCommand
+AutoFlySquareCommand = AutoFlySquareCommand

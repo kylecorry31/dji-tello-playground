@@ -12,6 +12,7 @@ class FakeDrone:
         self.z_velocity = 0
         self.yaw_velocity = 0
         self.m_is_flying = False
+        self.yaw = 0
         print("READY")
 
     def land(self):
@@ -37,7 +38,7 @@ class FakeDrone:
         self.y_velocity = 0
         self.z_velocity = 0
         self.yaw_velocity = 0
-        self.fly()
+        print("STOP")
 
     def fly(self):
         if self.m_is_flying:
@@ -54,3 +55,12 @@ class FakeDrone:
 
     def is_flying(self):
         return self.m_is_flying
+
+    def get_yaw(self):
+        return self.yaw
+
+    def fly_to(self, x, y, z, speed):
+        print("FLY TO", x, y, z, speed)
+
+    def rotate(self, yaw):
+        self.yaw += yaw

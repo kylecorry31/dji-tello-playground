@@ -33,7 +33,7 @@ class Drone:
         self.y_velocity = 0
         self.z_velocity = 0
         self.yaw_velocity = 0
-        self.fly()
+        self.tello.send_control_command("stop")
 
     def fly(self):
         if self.is_flying():
@@ -48,5 +48,17 @@ class Drone:
     def get_height(self):
         return self.tello.get_height()
 
+    def get_yaw(self):
+        return self.tello.get_yaw()
+
     def is_flying(self):
         return self.tello.is_flying
+
+    def fly_to(self, x, y, z, speed):
+        self.tello.go_xyz_speed(x, y, z, speed)
+
+    def rotate(self, yaw):
+        if yaw < 0:
+            self.tello.rotate_counter_clockwise(-yaw)
+        else:
+            self.tello.rotate_clockwise(yaw)

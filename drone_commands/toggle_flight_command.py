@@ -1,27 +1,11 @@
-from commands.command import Command
+from commands import ConditionalCommand
 from drone.drone import Drone
-import time
+
+from drone_commands.land_command import LandCommand
+from drone_commands.takeoff_command import TakeoffCommand
 
 
-class ToggleFlightCommand(Command):
+class ToggleFlightCommand(ConditionalCommand):
 
     def __init__(self, drone: Drone):
-        super().__init__(drone)
-        self.drone = drone
-        self.start_time = None
-        self.is_taking_off = False
-
-    def initialize(self):
-        self.is_taking_off = not self.drone.is_flying()
-        if self.is_taking_off:
-            self.drone.takeoff()
-        else:
-            self.drone.land()
-        self.start_time = time.time()
-
-    def is_finished(self):
-        # TODO: Base this off of height
-        return self.is_taking_off == self.drone.is_flying()
-
-    def end(self, interrupted):
-        self.drone.stop()
+        super().__init__(LandCommand(drone), TakeoffCommand(drone), lambda: drone.is_flying())

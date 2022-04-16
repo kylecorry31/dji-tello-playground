@@ -12,7 +12,7 @@ controller.when_pressed(Y, SequentialCommand(FlipLeftCommand(drone), WaitCommand
 controller.when_pressed(X, FlipLeftCommand(drone))
 controller.when_pressed(B, FlipRightCommand(drone))
 controller.when_pressed(A, ToggleFlightCommand(drone))
-controller.when_pressed(START, StopCommand(drone))
+controller.while_held(START, StopCommand(drone))
 runner.set_default_command(FlyCommand(drone, controller))
 runner.schedule(ShowVideoCommand(drone))
 

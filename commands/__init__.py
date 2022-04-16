@@ -1,3 +1,5 @@
+from commands.CancelCommand import CancelCommand
+from commands.ScheduleCommand import ScheduleCommand
 from commands.command import Command
 from commands.command_runner import CommandRunner
 from commands.conditional_command import ConditionalCommand
@@ -21,3 +23,5 @@ WaitUntilCommand = WaitUntilCommand
 ConditionalCommand = ConditionalCommand
 PerpetualCommand = PerpetualCommand
 RepeatCommand = RepeatCommand
+CancelCommand = CancelCommand
+ScheduleCommand = ScheduleCommand

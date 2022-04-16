@@ -4,7 +4,7 @@ from commands.command import Command
 class RepeatCommand(Command):
 
     def __init__(self, command: Command):
-        super().__init__(None)
+        super().__init__(command.requirement)
         self.command = command
 
     def initialize(self):

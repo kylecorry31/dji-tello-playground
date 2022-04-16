@@ -1,7 +1,5 @@
 from XInput import *
-
-from commands.command import Command
-from commands.command_runner import CommandRunner
+from commands import *
 
 A = BUTTON_A
 B = BUTTON_B
@@ -55,6 +53,11 @@ class XboxController(EventHandler):
         if stick_id not in self.sticks:
             return 0.0
         return self.sticks[stick_id][0]
+
+    def while_held(self, button_id: int, command: Command):
+        cmd = RepeatCommand(command)
+        self.when_pressed(button_id, cmd)
+        self.when_released(button_id, CancelCommand(cmd))
 
     def when_pressed(self, button_id: int, command: Command):
         to_remove = []

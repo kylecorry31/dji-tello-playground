@@ -47,6 +47,20 @@ class CommandRunner:
         self.active_commands.append(command)
         command.initialize()
 
+    def cancel(self, command):
+        if command in self.active_commands:
+            command.end(True)
+            self.active_commands.remove(command)
+            for cmd in self.default_commands:
+                self.schedule(cmd, False)
+
+    def remove_default_command(self, command):
+        if command in self.active_commands:
+            command.end(True)
+
+        self.active_commands.remove(command)
+        self.default_commands.remove(command)
+
     def set_default_command(self, command):
         if command.requirement is None:
             return

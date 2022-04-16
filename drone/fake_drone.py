@@ -11,24 +11,24 @@ class FakeDrone:
         self.y_velocity = 0
         self.z_velocity = 0
         self.yaw_velocity = 0
-        self.is_flying = False
+        self.m_is_flying = False
         print("READY")
 
     def land(self):
-        self.is_flying = False
+        self.m_is_flying = False
         print("LAND")
 
     def takeoff(self):
-        self.is_flying = True
+        self.m_is_flying = True
         print("TAKEOFF")
 
     def flip_left(self):
-        if self.is_flying:
+        if self.m_is_flying:
             self.stop()
             print("FLIP LEFT")
 
     def flip_right(self):
-        if self.is_flying:
+        if self.m_is_flying:
             self.stop()
             print("FLIP RIGHT")
 
@@ -40,7 +40,7 @@ class FakeDrone:
         self.fly()
 
     def fly(self):
-        if self.is_flying:
+        if self.m_is_flying:
             print("Fly", self.x_velocity, self.y_velocity, self.z_velocity, self.yaw_velocity)
 
     def disconnect(self):
@@ -48,3 +48,9 @@ class FakeDrone:
 
     def get_frame(self):
         return np.zeros((320, 240, 3), np.uint8)
+
+    def get_height(self):
+        return 0.0
+
+    def is_flying(self):
+        return self.m_is_flying

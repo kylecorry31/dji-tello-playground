@@ -12,7 +12,7 @@ class ToggleFlightCommand(Command):
         self.is_taking_off = False
 
     def initialize(self):
-        self.is_taking_off = not self.drone.is_flying
+        self.is_taking_off = not self.drone.is_flying()
         if self.is_taking_off:
             self.drone.takeoff()
         else:
@@ -21,7 +21,7 @@ class ToggleFlightCommand(Command):
 
     def is_finished(self):
         # TODO: Base this off of height
-        return time.time() - self.start_time > 2
+        return self.is_taking_off == self.drone.is_flying()
 
     def end(self, interrupted):
         self.drone.stop()

@@ -8,10 +8,10 @@ class FlyCommand(Command):
         super().__init__(drone)
         self.drone = drone
         self.controller = controller
-        self.x_speed = 50
-        self.y_speed = 50
-        self.z_speed = 50
-        self.yaw_speed = 50
+        self.x_speed = 100
+        self.y_speed = 100
+        self.z_speed = 100
+        self.yaw_speed = 100
 
     def execute(self):
         self.drone.z_velocity = (self.controller.get_trigger(RT) - self.controller.get_trigger(LT)) * self.z_speed

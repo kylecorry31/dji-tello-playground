@@ -1,4 +1,7 @@
+import logging
+
 import djitellopy
+from djitellopy import Tello
 
 
 class Drone:
@@ -8,9 +11,13 @@ class Drone:
         self.z_velocity = 0
         self.yaw_velocity = 0
         self.tello = djitellopy.Tello()
+        self.tello.LOGGER.setLevel(logging.ERROR)
         self.tello.connect()
-        self.tello.streamon()
+        print(self.tello.get_battery())
         print("READY")
+
+    def stream(self):
+        self.tello.streamon()
 
     def land(self):
         self.tello.land()
@@ -33,11 +40,11 @@ class Drone:
         self.y_velocity = 0
         self.z_velocity = 0
         self.yaw_velocity = 0
-        self.tello.send_control_command("stop")
+        self.fly()
 
     def fly(self):
         if self.is_flying():
-            self.tello.send_rc_control(self.x_velocity, self.y_velocity, self.z_velocity, self.yaw_velocity)
+            self.tello.send_rc_control(int(self.x_velocity), int(self.y_velocity), int(self.z_velocity), int(self.yaw_velocity))
 
     def disconnect(self):
         self.tello.end()
@@ -52,13 +59,13 @@ class Drone:
         return self.tello.get_yaw()
 
     def is_flying(self):
-        return self.tello.is_flying
+        return self.get_height() > 0
 
     def fly_to(self, x, y, z, speed):
-        self.tello.go_xyz_speed(x, y, z, speed)
+        self.tello.go_xyz_speed(int(x), int(y), int(z), int(speed))
 
     def rotate(self, yaw):
         if yaw < 0:
-            self.tello.rotate_counter_clockwise(-yaw)
+            self.tello.rotate_counter_clockwise(-int(yaw))
         else:
-            self.tello.rotate_clockwise(yaw)
+            self.tello.rotate_clockwise(int(yaw))

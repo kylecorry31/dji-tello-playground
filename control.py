@@ -1,5 +1,6 @@
 import cv2
 
+from commands import SequentialCommand
 from drone_commands import *
 from controller.xbox_controller import *
 from drone.fake_drone import FakeDrone
@@ -7,6 +8,7 @@ from drone.fake_drone import FakeDrone
 drone = FakeDrone()
 runner = CommandRunner.get_instance()
 controller = XboxController(0)
+controller.when_pressed(Y, SequentialCommand(FlipLeftCommand(drone), FlipRightCommand(drone)))
 controller.when_pressed(X, FlipLeftCommand(drone))
 controller.when_pressed(B, FlipRightCommand(drone))
 controller.when_pressed(A, ToggleFlightCommand(drone))

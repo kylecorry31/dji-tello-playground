@@ -3,7 +3,7 @@ from commands.command import Command
 
 class SequentialCommand(Command):
 
-    def __init__(self, commands: [Command]):
+    def __init__(self, *commands: [Command]):
         # TODO: Make requirements a list
         super().__init__(commands[0].requirement)
         self.commands = commands
@@ -25,7 +25,7 @@ class SequentialCommand(Command):
             command = self.commands[self.idx]
             command.execute()
             if command.is_finished():
-                command.end()
+                command.end(False)
                 self.__next_command()
 
     def __next_command(self):

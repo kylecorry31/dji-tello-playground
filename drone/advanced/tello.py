@@ -847,20 +847,11 @@ class Tello:
 
         if time.time() - self.last_rc_control_timestamp > self.TIME_BTW_RC_CONTROL_COMMANDS:
             self.last_rc_control_timestamp = time.time()
-            # if fast_mode:
             self.send_stick_command(clamp100(left_right_velocity),
                                     clamp100(forward_backward_velocity),
                                     clamp100(up_down_velocity),
                                     clamp100(yaw_velocity),
                                     fast_mode)
-            # else:
-            #     cmd = 'rc {} {} {} {}'.format(
-            #         clamp100(left_right_velocity),
-            #         clamp100(forward_backward_velocity),
-            #         clamp100(up_down_velocity),
-            #         clamp100(yaw_velocity)
-            #     )
-            #     self.send_command_without_return(cmd)
 
     def send_stick_command(self, x, y, z, yaw, fast_mode):
         pkt = Packet(protocol.STICK_CMD, 0x60)

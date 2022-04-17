@@ -24,8 +24,9 @@ class FlyCommand(Command):
         x = self.controller.get_x(RIGHT_STICK) * self.x_speed
         y = self.controller.get_y(RIGHT_STICK) * self.y_speed
         yaw = self.controller.get_x(LEFT_STICK) * self.yaw_speed
+        fast_mode = self.controller.get_button(DPAD_RIGHT)
         self.last_d_up = d_up
-        self.drone.fly(x, y, z, yaw, self.is_field_oriented)
+        self.drone.fly(x, y, z, yaw, self.is_field_oriented, fast_mode)
 
     def is_finished(self):
         return False

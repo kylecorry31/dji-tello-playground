@@ -1,5 +1,7 @@
 import logging
 
+from drone.advanced import protocol
+from drone.advanced.protocol import Packet
 from drone.advanced.tello import Tello
 from utils import delta_angle, rotate
 
@@ -25,11 +27,29 @@ class Drone:
         self.tello.send_command_without_return("takeoff")
         self.tello.is_flying = True
 
-    def flip_left(self):
-        self.tello.flip_left()
+    def flip_forward(self):
+        self.tello.flip_forward()
+
+    def flip_back(self):
+        self.tello.flip_back()
 
     def flip_right(self):
         self.tello.flip_right()
+
+    def flip_left(self):
+        self.tello.flip_left()
+
+    def flip_forwardleft(self):
+        self.tello.flip_forwardleft()
+
+    def flip_backleft(self):
+        self.tello.flip_backleft()
+
+    def flip_forwardright(self):
+        self.tello.flip_forwardright()
+
+    def flip_backright(self):
+        self.tello.flip_backright()
 
     def stop(self):
         self.fly(0, 0, 0, 0)

@@ -3,7 +3,7 @@ from drone.drone import Drone
 import time
 
 
-class FlipRightCommand(Command):
+class FlipForwardCommand(Command):
 
     def __init__(self, drone: Drone):
         super().__init__(drone)
@@ -11,7 +11,7 @@ class FlipRightCommand(Command):
         self.start_time = None
 
     def initialize(self):
-        self.drone.flip_right()
+        self.drone.flip_forward()
         self.start_time = time.time()
 
     def is_finished(self):

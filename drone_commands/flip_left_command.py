@@ -15,7 +15,7 @@ class FlipLeftCommand(Command):
         self.start_time = time.time()
 
     def is_finished(self):
-        return time.time() - self.start_time > 1
+        return time.time() - self.start_time > 0.5
 
     def end(self, interrupted):
         self.drone.stop()

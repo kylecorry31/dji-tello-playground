@@ -675,33 +675,53 @@ class Tello:
         """
         self.send_control_command("ccw {}".format(x))
 
-    def flip(self, direction: str):
-        """Do a flip maneuver.
-        Users would normally call one of the flip_x functions instead.
-        Arguments:
-            direction: l (left), r (right), f (forward) or b (back)
-        """
-        self.send_control_command("flip {}".format(direction))
-
-    def flip_left(self):
-        """Flip to the left.
-        """
-        self.flip("l")
-
-    def flip_right(self):
-        """Flip to the right.
-        """
-        self.flip("r")
-
     def flip_forward(self):
-        """Flip forward.
-        """
-        self.flip("f")
+        pkt = Packet(protocol.FLIP_CMD, 0x70)
+        pkt.add_byte(protocol.FlipFront)
+        pkt.fixup()
+        self.send_packet(pkt)
 
     def flip_back(self):
-        """Flip backwards.
-        """
-        self.flip("b")
+        pkt = Packet(protocol.FLIP_CMD, 0x70)
+        pkt.add_byte(protocol.FlipBack)
+        pkt.fixup()
+        self.send_packet(pkt)
+
+    def flip_right(self):
+        pkt = Packet(protocol.FLIP_CMD, 0x70)
+        pkt.add_byte(protocol.FlipRight)
+        pkt.fixup()
+        self.send_packet(pkt)
+
+    def flip_left(self):
+        pkt = Packet(protocol.FLIP_CMD, 0x70)
+        pkt.add_byte(protocol.FlipLeft)
+        pkt.fixup()
+        self.send_packet(pkt)
+
+    def flip_forwardleft(self):
+        pkt = Packet(protocol.FLIP_CMD, 0x70)
+        pkt.add_byte(protocol.FlipForwardLeft)
+        pkt.fixup()
+        self.send_packet(pkt)
+
+    def flip_backleft(self):
+        pkt = Packet(protocol.FLIP_CMD, 0x70)
+        pkt.add_byte(protocol.FlipBackLeft)
+        pkt.fixup()
+        self.send_packet(pkt)
+
+    def flip_forwardright(self):
+        pkt = Packet(protocol.FLIP_CMD, 0x70)
+        pkt.add_byte(protocol.FlipForwardRight)
+        pkt.fixup()
+        self.send_packet(pkt)
+
+    def flip_backright(self):
+        pkt = Packet(protocol.FLIP_CMD, 0x70)
+        pkt.add_byte(protocol.FlipBackRight)
+        pkt.fixup()
+        self.send_packet(pkt)
 
     def go_xyz_speed(self, x: int, y: int, z: int, speed: int):
         """Fly to x y z relative to the current position.
@@ -827,20 +847,20 @@ class Tello:
 
         if time.time() - self.last_rc_control_timestamp > self.TIME_BTW_RC_CONTROL_COMMANDS:
             self.last_rc_control_timestamp = time.time()
-            if fast_mode:
-                self.send_stick_command(clamp100(left_right_velocity),
-                                        clamp100(forward_backward_velocity),
-                                        clamp100(up_down_velocity),
-                                        clamp100(yaw_velocity),
-                                        fast_mode)
-            else:
-                cmd = 'rc {} {} {} {}'.format(
-                    clamp100(left_right_velocity),
-                    clamp100(forward_backward_velocity),
-                    clamp100(up_down_velocity),
-                    clamp100(yaw_velocity)
-                )
-                self.send_command_without_return(cmd)
+            # if fast_mode:
+            self.send_stick_command(clamp100(left_right_velocity),
+                                    clamp100(forward_backward_velocity),
+                                    clamp100(up_down_velocity),
+                                    clamp100(yaw_velocity),
+                                    fast_mode)
+            # else:
+            #     cmd = 'rc {} {} {} {}'.format(
+            #         clamp100(left_right_velocity),
+            #         clamp100(forward_backward_velocity),
+            #         clamp100(up_down_velocity),
+            #         clamp100(yaw_velocity)
+            #     )
+            #     self.send_command_without_return(cmd)
 
     def send_stick_command(self, x, y, z, yaw, fast_mode):
         pkt = Packet(protocol.STICK_CMD, 0x60)

@@ -1034,7 +1034,7 @@ class Tello:
         """
         return self.send_read_command('active?')
 
-    def set_max_altitude_limit(self):
+    def remove_altitude_limit(self):
         pkt = Packet(protocol.SET_ALT_LIMIT_CMD)
         pkt.add_byte(0x1e)  # 30m
         pkt.add_byte(0x00)

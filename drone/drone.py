@@ -21,7 +21,7 @@ class Drone:
         self.tello.land()
 
     def takeoff(self):
-        self.tello.set_max_altitude_limit()
+        self.tello.remove_altitude_limit()
         self.tello.send_command_without_return("takeoff")
         self.tello.is_flying = True
 
@@ -58,6 +58,15 @@ class Drone:
 
     def get_barometer(self):
         return self.tello.get_barometer()
+
+    def emergency_stop(self):
+        self.tello.emergency()
+
+    def get_speed(self):
+        return self.tello.get_speed_x(), self.tello.get_speed_y(), self.tello.get_speed_z()
+
+    def get_acceleration(self):
+        return self.tello.get_acceleration_x(), self.tello.get_acceleration_y(), self.tello.get_acceleration_z()
 
     def get_yaw(self):
         if self.yaw is None:

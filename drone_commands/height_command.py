@@ -35,7 +35,7 @@ class HeightCommand(Command):
     def get_error(self):
         if self.relative:
             return self.height - self.get_height()
-        return self.height - self.drone.get_height()
+        return self.height - self.drone.get_tof()
 
     def get_height(self):
         return self.drone.get_height() - self.start_height

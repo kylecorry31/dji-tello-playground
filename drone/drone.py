@@ -53,6 +53,9 @@ class Drone:
     def get_height(self):
         return self.tello.get_height()
 
+    def get_tof(self):
+        return self.tello.get_distance_tof()
+
     def get_yaw(self):
         if self.yaw is None:
             self.reset_heading()

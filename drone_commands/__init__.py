@@ -3,6 +3,7 @@ from drone_commands.flip_right_command import FlipRightCommand
 from drone_commands.fly_command import FlyCommand
 from drone_commands.fly_square_command import AutoFlySquareCommand
 from drone_commands.fly_to_command import FlyToCommand
+from drone_commands.height_command import HeightCommand
 from drone_commands.land_command import LandCommand
 from drone_commands.reset_heading_command import ResetHeadingCommand
 from drone_commands.rotate_command import RotateCommand
@@ -23,3 +24,4 @@ LandCommand = LandCommand
 TakeoffCommand = TakeoffCommand
 AutoFlySquareCommand = AutoFlySquareCommand
 ResetHeadingCommand = ResetHeadingCommand
+HeightCommand = HeightCommand

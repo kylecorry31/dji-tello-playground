@@ -1,28 +1,28 @@
 from commands.command import Command
 from drone.drone import Drone
-from utils import clamp, delta_angle
+from utils import clamp
 import time
 
 
-class RotateCommand(Command):
+class HeightCommand(Command):
 
-    def __init__(self, drone: Drone, yaw: float, relative=True):
+    def __init__(self, drone: Drone, height: float, relative=True):
         super().__init__(drone)
         self.drone = drone
         self.start_time = None
-        self.yaw = yaw
-        self.start_yaw = None
+        self.height = height
+        self.start_height = None
         self.relative = relative
         self.estimated_time = None
 
     def initialize(self):
         self.estimated_time = abs(self.get_error()) / 65
-        self.start_yaw = self.drone.get_yaw()
+        self.start_height = self.drone.get_height()
         self.start_time = time.time()
 
     def execute(self):
         error = self.get_error()
-        self.drone.fly(0, 0, 0, clamp(error * 0.05, -1, 1))
+        self.drone.fly(0, 0, clamp(error * 0.05, -1, 1), 0)
 
     def is_finished(self):
         expired = time.time() - self.start_time >= self.estimated_time
@@ -34,8 +34,8 @@ class RotateCommand(Command):
 
     def get_error(self):
         if self.relative:
-            return self.yaw - self.get_yaw()
-        return delta_angle(self.drone.get_yaw(), self.yaw)
+            return self.height - self.get_height()
+        return self.height - self.drone.get_height()
 
-    def get_yaw(self):
-        return self.drone.get_yaw() - self.start_yaw
+    def get_height(self):
+        return self.drone.get_height() - self.start_height

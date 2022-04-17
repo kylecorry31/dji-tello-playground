@@ -11,7 +11,7 @@ class AutoFlySquareCommand(SequentialCommand):
     def __init__(self, drone: Drone):
         super().__init__(
             TakeoffCommand(drone),
-            RotateCommand(drone, -90),
+            # RotateCommand(drone, -90),
             # FlyToCommand(drone, 0, 50, 0, 50),
             # FlyToCommand(drone, 50, 0, 0, 50),
             # FlyToCommand(drone, 0, -50, 0, 50),

@@ -16,7 +16,7 @@ class FlyToCommand(Command):
         self.z = z
         self.speed = speed
         distance = math.sqrt(x ** 2 + y ** 2 + z ** 2)
-        self.estimated_time = distance / speed
+        self.estimated_time = distance / (speed * 100)
 
     def initialize(self):
         self.drone.fly_to(self.x, self.y, self.z, self.speed)

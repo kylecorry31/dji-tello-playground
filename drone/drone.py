@@ -2,7 +2,7 @@ import logging
 
 import djitellopy
 
-from utils import delta_angle
+from utils import delta_angle, rotate
 
 
 class Drone:
@@ -34,7 +34,11 @@ class Drone:
     def stop(self):
         self.fly(0, 0, 0, 0)
 
-    def fly(self, x, y, z, yaw):
+    def fly(self, x, y, z, yaw, field_oriented=False):
+        if field_oriented:
+            rotated = rotate((x, y), self.get_yaw())
+            x = rotated[0]
+            y = rotated[1]
         self.tello.send_rc_control(int(x * 100), int(y * 100), int(z * 100), int(yaw * 100))
 
     def disconnect(self):
@@ -48,8 +52,7 @@ class Drone:
 
     def get_yaw(self):
         if self.yaw is None:
-            self.last_yaw = self.tello.get_yaw()
-            self.yaw = 0
+            self.reset_heading()
         current_yaw = self.tello.get_yaw()
         if current_yaw < 0:
             current_yaw += 360
@@ -71,3 +74,7 @@ class Drone:
             self.tello.rotate_counter_clockwise(-int(yaw))
         else:
             self.tello.rotate_clockwise(int(yaw))
+
+    def reset_heading(self):
+        self.last_yaw = self.tello.get_yaw()
+        self.yaw = 0

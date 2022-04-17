@@ -14,7 +14,6 @@ class TakeoffCommand(Command):
         self.drone.takeoff()
 
     def is_finished(self):
-        # TODO: Base this off of height
         return self.drone.is_flying()
 
     def end(self, interrupted):

@@ -14,7 +14,6 @@ class LandCommand(Command):
         self.drone.land()
 
     def is_finished(self):
-        # TODO: Base this off of height
         return not self.drone.is_flying()
 
     def end(self, interrupted):

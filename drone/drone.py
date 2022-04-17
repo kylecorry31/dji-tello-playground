@@ -23,7 +23,8 @@ class Drone:
         self.tello.land()
 
     def takeoff(self):
-        self.tello.takeoff()
+        self.tello.send_command_without_return("takeoff")
+        self.tello.is_flying = True
 
     def flip_left(self):
         if self.is_flying():

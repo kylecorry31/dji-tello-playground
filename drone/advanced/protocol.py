@@ -1,3 +1,5 @@
+# From https://github.com/hanyazou/TelloPy/
+
 import datetime
 import struct
 from io import BytesIO

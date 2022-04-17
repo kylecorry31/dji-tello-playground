@@ -1,20 +1,13 @@
 import logging
-import struct
 import socket
 
-import djitellopy
-from djitellopy import Tello
-# from djitellopy.tello import client_socket
-
-from drone.advanced import protocol
-from drone.advanced.protocol import Packet
-from drone.advanced.utils import byte
+from drone.advanced.tello import Tello
 from utils import delta_angle, rotate
 
 
 class Drone:
     def __init__(self):
-        self.tello = djitellopy.Tello()
+        self.tello = Tello()
         self.tello.LOGGER.setLevel(logging.ERROR)
         self.tello.connect()
         self.yaw = None
@@ -31,7 +24,7 @@ class Drone:
         self.tello.land()
 
     def takeoff(self):
-        self.__set_max_altitude_limit()
+        self.tello.set_max_altitude_limit()
         self.tello.send_command_without_return("takeoff")
         self.tello.is_flying = True
 
@@ -49,27 +42,7 @@ class Drone:
             rotated = rotate((x, y), self.get_yaw())
             x = rotated[0]
             y = rotated[1]
-        if not fast_mode:
-            self.tello.send_rc_control(int(x * 100), int(y * 100), int(z * 100), int(yaw * 100))
-        else:
-            pkt = Packet(protocol.STICK_CMD, 0x60)
-            axis1 = int(1024 + 660.0 * x) & 0x7ff
-            axis2 = int(1024 + 660.0 * y) & 0x7ff
-            axis3 = int(1024 + 660.0 * z) & 0x7ff
-            axis4 = int(1024 + 660.0 * yaw) & 0x7ff
-            axis5 = int(fast_mode) & 0x01
-            packed = axis1 | (axis2 << 11) | (
-                    axis3 << 22) | (axis4 << 33) | (axis5 << 44)
-            packed_bytes = struct.pack('<Q', packed)
-            pkt.add_byte(byte(packed_bytes[0]))
-            pkt.add_byte(byte(packed_bytes[1]))
-            pkt.add_byte(byte(packed_bytes[2]))
-            pkt.add_byte(byte(packed_bytes[3]))
-            pkt.add_byte(byte(packed_bytes[4]))
-            pkt.add_byte(byte(packed_bytes[5]))
-            pkt.add_time()
-            pkt.fixup()
-            self.__send_packet(pkt)
+        self.tello.send_rc_control(int(x * 100), int(y * 100), int(z * 100), int(yaw * 100), fast_mode)
 
     def disconnect(self):
         self.tello.end()
@@ -111,19 +84,3 @@ class Drone:
     def reset_heading(self):
         self.last_yaw = self.tello.get_yaw()
         self.yaw = 0
-
-    def __set_max_altitude_limit(self):
-        pkt = Packet(protocol.SET_ALT_LIMIT_CMD)
-        pkt.add_byte(0x1e)  # 30m
-        pkt.add_byte(0x00)
-        pkt.fixup()
-        self.__send_packet(pkt)
-
-    def __send_packet(self, pkt):
-        try:
-            cmd = pkt.get_buffer()
-            socket.sendto(cmd, self.tello.address)
-        except Exception as err:
-            return False
-
-        return True

@@ -1,5 +1,4 @@
 import logging
-import socket
 
 from drone.advanced.tello import Tello
 from utils import delta_angle, rotate
@@ -12,8 +11,6 @@ class Drone:
         self.tello.connect()
         self.yaw = None
         self.last_yaw = 0
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.bind(('', 9001))
         print(self.tello.get_battery())
         print("READY")
 

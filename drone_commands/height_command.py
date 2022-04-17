@@ -16,9 +16,9 @@ class HeightCommand(Command):
         self.estimated_time = None
 
     def initialize(self):
-        self.estimated_time = abs(self.get_error()) / 65
         self.start_height = self.drone.get_height()
         self.start_time = time.time()
+        self.estimated_time = abs(self.get_error()) / 65
 
     def execute(self):
         error = self.get_error()
@@ -26,7 +26,7 @@ class HeightCommand(Command):
 
     def is_finished(self):
         expired = time.time() - self.start_time >= self.estimated_time
-        at_target = abs(self.get_error()) <= 1
+        at_target = abs(self.get_error()) <= 2
         return at_target or expired
 
     def end(self, interrupted):

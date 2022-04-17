@@ -16,9 +16,9 @@ class RotateCommand(Command):
         self.estimated_time = None
 
     def initialize(self):
-        self.estimated_time = abs(self.get_error()) / 65
         self.start_yaw = self.drone.get_yaw()
         self.start_time = time.time()
+        self.estimated_time = abs(self.get_error()) / 65
 
     def execute(self):
         error = self.get_error()

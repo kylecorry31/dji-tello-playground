@@ -8,14 +8,13 @@ class LandCommand(Command):
         super().__init__(drone)
         self.drone = drone
 
-    def initialize(self):
-        if self.is_finished():
-            return
-        self.drone.land()
+    def execute(self):
+        self.drone.fly(0, 0, -1, 0)
 
     def is_finished(self):
         return not self.drone.is_flying()
 
     def end(self, interrupted):
-        if interrupted:
-            self.drone.stop()
+        if not interrupted:
+            self.drone.land()
+        self.drone.stop()

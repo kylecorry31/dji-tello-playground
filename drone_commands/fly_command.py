@@ -8,18 +8,18 @@ class FlyCommand(Command):
         super().__init__(drone)
         self.drone = drone
         self.controller = controller
-        self.x_speed = 100
-        self.y_speed = 100
-        self.z_speed = 100
-        self.yaw_speed = 100
+        self.x_speed = 1.0
+        self.y_speed = 1.0
+        self.z_speed = 1.0
+        self.yaw_speed = 1.0
 
     def execute(self):
-        self.drone.z_velocity = (self.controller.get_trigger(RT) - self.controller.get_trigger(LT)) * self.z_speed
-        self.drone.x_velocity = self.controller.get_x(RIGHT_STICK) * self.x_speed
-        self.drone.y_velocity = self.controller.get_y(RIGHT_STICK) * self.y_speed
-        self.drone.yaw_velocity = self.controller.get_x(LEFT_STICK) * self.yaw_speed
+        z = (self.controller.get_trigger(RT) - self.controller.get_trigger(LT)) * self.z_speed
+        x = self.controller.get_x(RIGHT_STICK) * self.x_speed
+        y = self.controller.get_y(RIGHT_STICK) * self.y_speed
+        yaw = self.controller.get_x(LEFT_STICK) * self.yaw_speed
 
-        self.drone.fly()
+        self.drone.fly(x, y, z, yaw)
 
     def is_finished(self):
         return False

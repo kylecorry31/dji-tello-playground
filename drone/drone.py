@@ -1,18 +1,17 @@
 import logging
 
 import djitellopy
-from djitellopy import Tello
+
+from utils import delta_angle
 
 
 class Drone:
     def __init__(self):
-        self.x_velocity = 0
-        self.y_velocity = 0
-        self.z_velocity = 0
-        self.yaw_velocity = 0
         self.tello = djitellopy.Tello()
         self.tello.LOGGER.setLevel(logging.ERROR)
         self.tello.connect()
+        self.yaw = None
+        self.last_yaw = 0
         print(self.tello.get_battery())
         print("READY")
 
@@ -27,25 +26,16 @@ class Drone:
         self.tello.is_flying = True
 
     def flip_left(self):
-        if self.is_flying():
-            self.stop()
-            self.tello.flip_left()
+        self.tello.flip_left()
 
     def flip_right(self):
-        if self.is_flying():
-            self.stop()
-            self.tello.flip_right()
+        self.tello.flip_right()
 
     def stop(self):
-        self.x_velocity = 0
-        self.y_velocity = 0
-        self.z_velocity = 0
-        self.yaw_velocity = 0
-        self.fly()
+        self.fly(0, 0, 0, 0)
 
-    def fly(self):
-        if self.is_flying():
-            self.tello.send_rc_control(int(self.x_velocity), int(self.y_velocity), int(self.z_velocity), int(self.yaw_velocity))
+    def fly(self, x, y, z, yaw):
+        self.tello.send_rc_control(int(x * 100), int(y * 100), int(z * 100), int(yaw * 100))
 
     def disconnect(self):
         self.tello.end()
@@ -57,13 +47,24 @@ class Drone:
         return self.tello.get_height()
 
     def get_yaw(self):
-        return self.tello.get_yaw()
+        if self.yaw is None:
+            self.last_yaw = self.tello.get_yaw()
+            self.yaw = 0
+        current_yaw = self.tello.get_yaw()
+        if current_yaw < 0:
+            current_yaw += 360
+        delta = delta_angle(self.last_yaw, current_yaw)
+        self.last_yaw = current_yaw
+        self.yaw += delta
+        return self.yaw
 
     def is_flying(self):
-        return self.get_height() > 0
+        flying = self.get_height() > 0
+        self.tello.is_flying = flying
+        return flying
 
     def fly_to(self, x, y, z, speed):
-        self.tello.go_xyz_speed(int(x), int(y), int(z), int(speed))
+        self.tello.go_xyz_speed(int(x), int(y), int(z), int(speed * 100))
 
     def rotate(self, yaw):
         if yaw < 0:

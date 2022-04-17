@@ -4,7 +4,7 @@ from commands.command import Command
 class ConditionalCommand(Command):
 
     def __init__(self, on_true: Command, on_false: Command, predicate):
-        super().__init__(None)
+        super().__init__(on_true.requirement)
         self.on_true = on_true
         self.on_false = on_false
         self.predicate = predicate

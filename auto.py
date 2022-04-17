@@ -1,22 +1,21 @@
 import cv2
 
+from drone.drone import Drone
 from drone_commands import *
 from controller.xbox_controller import *
-from drone.fake_drone import FakeDrone
 
-drone = FakeDrone()
+drone = Drone()
 runner = CommandRunner.get_instance()
-runner.schedule(ShowVideoCommand(drone))
+# runner.schedule(ShowVideoCommand(drone))
 runner.schedule(AutoFlySquareCommand(drone))
 
 while True:
     try:
         runner.update()
-        if cv2.waitKey(1) & 0xFF == ord('x'):
-            break
+        time.sleep(0.01)
     except KeyboardInterrupt:
         break
 
-runner.cancel_all()
+runner.cancel_all(True)
 drone.disconnect()
 cv2.destroyAllWindows()

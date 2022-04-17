@@ -74,10 +74,11 @@ class CommandRunner:
         self.default_commands.append(command)
         self.schedule(command, False)
 
-    def cancel_all(self):
+    def cancel_all(self, prevent_default=False):
         for c in self.active_commands:
             c.end(True)
         self.active_commands = []
 
-        for cmd in self.default_commands:
-            self.schedule(cmd, False)
+        if not prevent_default:
+            for cmd in self.default_commands:
+                self.schedule(cmd, False)

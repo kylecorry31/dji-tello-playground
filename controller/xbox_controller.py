@@ -91,7 +91,7 @@ class XboxController(EventHandler):
 
         for cmd in self.button_commands:
             if cmd[0] == event.button_id and cmd[1] == event.type:
-                CommandRunner.get_instance().schedule(cmd[2])
+                CommandRunner.get_instance().schedule(cmd[2], True)
 
     def process_trigger_event(self, event):
         self.triggers[event.trigger] = event.value

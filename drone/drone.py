@@ -44,6 +44,9 @@ class Drone:
     def disconnect(self):
         self.tello.end()
 
+    def get_video(self):
+        return self.tello.get_video_capture()
+
     def get_frame(self):
         return self.tello.get_frame_read().frame
 

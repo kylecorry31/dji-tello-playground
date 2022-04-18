@@ -68,6 +68,9 @@ class Drone:
     def get_frame(self):
         return self.tello.get_frame_read().frame
 
+    def get_battery(self):
+        return self.tello.get_battery()
+
     def get_height(self):
         return self.tello.get_height()
 

@@ -107,6 +107,7 @@ class Tello:
         self.retry_count = retry_count
         self.last_received_command_timestamp = time.time()
         self.last_rc_control_timestamp = time.time()
+        self.was_fast_mode = False
 
         if not threads_initialized:
             # Run Tello command responses UDP receiver on background
@@ -847,11 +848,19 @@ class Tello:
 
         if time.time() - self.last_rc_control_timestamp > self.TIME_BTW_RC_CONTROL_COMMANDS:
             self.last_rc_control_timestamp = time.time()
-            self.send_stick_command(clamp100(left_right_velocity),
-                                    clamp100(forward_backward_velocity),
-                                    clamp100(up_down_velocity),
-                                    clamp100(yaw_velocity),
-                                    fast_mode)
+
+            if fast_mode or self.was_fast_mode:
+                self.send_stick_command(clamp100(left_right_velocity),
+                                        clamp100(forward_backward_velocity),
+                                        clamp100(up_down_velocity),
+                                        clamp100(yaw_velocity),
+                                        fast_mode)
+            else:
+                self.send_command_without_return('rc {} {} {} {}'.format(clamp100(left_right_velocity),
+                                                                         clamp100(forward_backward_velocity),
+                                                                         clamp100(up_down_velocity),
+                                                                         clamp100(yaw_velocity)))
+            self.was_fast_mode = fast_mode
 
     def send_stick_command(self, x, y, z, yaw, fast_mode):
         pkt = Packet(protocol.STICK_CMD, 0x60)

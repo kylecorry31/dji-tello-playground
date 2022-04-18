@@ -16,7 +16,7 @@ class ShowVideoCommand(Command):
 
     def initialize(self):
         self.drone.stream()
-        # TODO: Create a virtual environment for this
+        # TODO: Create a virtual environment for this / put together readme
         self.process = subprocess.Popen("C:\\Users\\Kylec\\anaconda3\\envs\\tello2.7\\python.exe video/video.py",
                                         stderr=subprocess.DEVNULL)
 

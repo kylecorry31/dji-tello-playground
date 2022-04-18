@@ -1,7 +1,5 @@
 import logging
 
-from drone.advanced import protocol
-from drone.advanced.protocol import Packet
 from drone.advanced.tello import Tello
 from utils import delta_angle, rotate
 

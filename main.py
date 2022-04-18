@@ -7,6 +7,7 @@ from drone_commands import *
 from controller.xbox_controller import *
 from drone_commands.flip_backward_command import FlipBackwardCommand
 from drone_commands.flip_forward_command import FlipForwardCommand
+from drone_commands.height_estimation_command import HeightEstimationCommand
 from drone_commands.value_display_command import ValueDisplayCommand
 
 
@@ -25,6 +26,7 @@ runner = CommandRunner.get_instance()
 def init():
     runner.schedule(ShowVideoCommand(drone))
     runner.schedule(ValueDisplayCommand(drone))
+    runner.schedule(HeightEstimationCommand(drone))
 
 
 def autonomous():

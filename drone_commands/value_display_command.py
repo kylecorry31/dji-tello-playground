@@ -26,16 +26,16 @@ class ValueDisplayCommand(Command):
                 self.position = (
                     self.position[0] + x_speed * dt,
                     self.position[1] + y_speed * dt,
-                    self.drone.get_tof()
+                    self.drone.get_height_from_start()
                 )
                 self.last_execute = time.time()
         else:
             self.last_execute = time.time()
 
-        if self.last_time is None or time.time() - self.last_time > 1:
+        if self.last_time is None or time.time() - self.last_time > 0.1:
             self.last_time = time.time()
             pos = (int(self.position[0]), int(self.position[1]), int(self.position[2]))
-            print(pos, self.drone.get_battery())
+            print(pos, int(self.drone.get_height_from_ground()), self.drone.get_battery())
 
     def is_finished(self):
         return False

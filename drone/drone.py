@@ -11,6 +11,9 @@ class Drone:
         self.tello.connect()
         self.yaw = None
         self.last_yaw = 0
+        self.start_height = 0
+        self.h = 0
+        self.last_barometer = None
         print(self.tello.get_battery())
         print("READY")
 
@@ -71,6 +74,14 @@ class Drone:
     def get_battery(self):
         return self.tello.get_battery()
 
+    def get_height_from_ground(self):
+        return self.h
+
+    def get_height_from_start(self):
+        if self.start_height == 0:
+            self.start_height = self.tello.get_barometer()
+        return self.tello.get_barometer() - self.start_height
+
     def get_height(self):
         return self.tello.get_height()
 
@@ -78,7 +89,12 @@ class Drone:
         return self.tello.get_distance_tof()
 
     def get_barometer(self):
-        return self.tello.get_barometer()
+        baro = self.tello.get_barometer()
+        if baro is not None and baro > 0:
+            if self.last_barometer is None:
+                self.last_barometer = baro
+            self.last_barometer = self.last_barometer * 0.95 + baro * 0.05
+        return self.last_barometer
 
     def emergency_stop(self):
         self.tello.emergency()

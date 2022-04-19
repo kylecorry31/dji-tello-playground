@@ -18,6 +18,14 @@ def streamon() -> bytes:
     return __bytes("streamon")
 
 
+def ok() -> bytes:
+    return __bytes("ok")
+
+
+def error() -> bytes:
+    return __bytes("error")
+
+
 def streamoff() -> bytes:
     return __bytes("streamoff")
 

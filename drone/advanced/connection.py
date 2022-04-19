@@ -25,7 +25,7 @@ class Connection:
             try:
                 data, address = self.socket.recvfrom(1024)
                 if self.print_responses:
-                    print(data)
+                    print(data, address)
                 if address != self.request_address:
                     continue
                 self.response = data

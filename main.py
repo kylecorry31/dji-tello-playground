@@ -51,7 +51,7 @@ def teleop():
     controller.when_pressed(DPAD_DOWN, FlipBackwardCommand(drone))
     controller.when_pressed(DPAD_LEFT, FlipLeftCommand(drone))
     controller.when_pressed(DPAD_RIGHT, FlipRightCommand(drone))
-    height = HeightCommand(drone, 100, False)
+    height = HeightCommand(drone, 121.9, False)
     controller.while_held(LB, height)
     # controller.when_released(LB, CancelCommand(height))
     controller.while_held(START, StopCommand(drone))

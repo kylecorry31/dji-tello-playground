@@ -3,12 +3,13 @@ import logging
 from drone.advanced.tello import Tello
 from drone.sensors.accelerometer import Accelerometer
 from drone.sensors.barometer import Barometer
+from drone.sensors.compass import Compass
 from drone.sensors.flight_time import FlightTime
 from drone.sensors.fused_altimeter import FusedAltimeter
-from drone.sensors.linear_accelerometer import LinearAccelerometer
 from drone.sensors.mvo import MVO
+from drone.sensors.mvo_position_sensor import MVOPositionSensor
 from drone.sensors.tof import TOF
-from utils import delta_angle, rotate
+from utils import rotate
 
 
 class Drone:
@@ -16,33 +17,37 @@ class Drone:
         self.tello = Tello()
         self.tello.LOGGER.setLevel(logging.ERROR)
         self.tello.connect()
-        self.yaw = None
-        self.last_yaw = 0
         self.start_height = 0
         self.barometer = Barometer(self.tello)
         self.accelerometer = Accelerometer(self.tello)
         self.mvo = MVO(self.tello)
         self.tof = TOF(self.tello)
         self.flight_time = FlightTime(self.tello)
+        self.compass = Compass(self.tello)
+        self.position = MVOPositionSensor(self.mvo, self.compass)
         self.altimeter = FusedAltimeter(self.tof, self.barometer, self.mvo, self.accelerometer, self.flight_time)
         print(self.tello.get_battery())
         print("READY")
 
     def reset_sensors(self):
+        self.compass.reset()
         self.flight_time.reset()
         self.barometer.reset()
         self.accelerometer.reset()
         self.mvo.reset()
         self.tof.reset()
         self.altimeter.reset()
+        self.position.reset()
 
     def update_sensors(self):
+        self.compass.update()
         self.flight_time.update()
         self.barometer.update()
         self.accelerometer.update()
         self.mvo.update()
         self.tof.update()
         self.altimeter.update()
+        self.position.update()
 
     def stream(self):
         self.tello.streamon()
@@ -117,16 +122,7 @@ class Drone:
         self.tello.emergency()
 
     def get_yaw(self):
-        # TODO: Extract this to a sensor
-        if self.yaw is None:
-            self.reset_heading()
-        current_yaw = self.tello.get_yaw()
-        if current_yaw < 0:
-            current_yaw += 360
-        delta = delta_angle(self.last_yaw, current_yaw)
-        self.last_yaw = current_yaw
-        self.yaw += delta
-        return self.yaw
+        return self.compass.read()
 
     def is_flying(self):
         flying = self.get_height() != 0
@@ -143,5 +139,4 @@ class Drone:
             self.tello.rotate_clockwise(int(yaw))
 
     def reset_heading(self):
-        self.last_yaw = self.tello.get_yaw()
-        self.yaw = 0
+        self.compass.reset()

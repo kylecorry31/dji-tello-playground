@@ -23,7 +23,7 @@ class Connection:
     def __receiver(self):
         while True:
             try:
-                data, address = self.socket.recvfrom(1024)
+                data, address = self.socket.recvfrom(self.response_buffer_size)
                 if self.print_responses:
                     print(data, address)
                 if address != self.request_address:

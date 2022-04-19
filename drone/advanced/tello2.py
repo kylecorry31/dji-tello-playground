@@ -1,4 +1,4 @@
-from drone.advanced import api
+from drone.advanced import sdk
 from drone.advanced.connection import Connection
 from drone.advanced.tello_state import parse_state, empty_state
 from utils import clamp
@@ -9,6 +9,8 @@ class Tello2:
         self.state = empty_state()
         self.command_conn = Connection('192.168.10.1', 8889, 8889)
         self.state_conn = Connection('192.168.10.1', 8889, 8890)
+        self.video_conn = Connection('192.168.10.1', 8889, 11111, response_buffer_size=2048)
+        # TODO: Expose a way to listen for frames
         self.state_conn.listen(self.__state_listener)
 
     def command(self):

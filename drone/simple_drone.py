@@ -5,19 +5,17 @@ class SimpleDrone:
     def __init__(self):
         self.tello = Tello2()
         self.tello.command()
-        self.did_takeoff = False
+        self.tello.set_stream(True)
         print("READY")
 
     def land(self):
         self.tello.land()
-        self.did_takeoff = False
 
     def takeoff(self):
         self.tello.takeoff()
-        self.did_takeoff = True
 
     def is_flying(self):
-        return self.did_takeoff
+        return self.tello.get_state().h != 0
 
     def stop(self):
         self.fly(0, 0, 0, 0)

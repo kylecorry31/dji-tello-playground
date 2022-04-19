@@ -1,42 +1,51 @@
-import time
-
+import threading
 from commands import Command
 from drone.drone import Drone
-from utils import rotate
+from ui import easy_draw
+
+
+def round_places(num, places):
+    return round(num * 10 ** places) / 10 ** places
 
 
 class ValueDisplayCommand(Command):
     def __init__(self, drone: Drone):
         super().__init__(None)
         self.drone = drone
-        self.last_time = None
-        self.last_execute = None
-        self.position = (0, 0, 0)
+        self.thread = None
+
+    def run(self):
+        easy_draw.load_canvas('#ffffff')
+
+        start = 16
+        spacing = 32
+
+        battery = easy_draw.Text(
+            center_xy=(100, start)
+        )
+        height = easy_draw.Text(
+            center_xy=(100, start + spacing)
+        )
+        time = easy_draw.Text(
+            center_xy=(100, start + spacing * 2)
+        )
+
+        def update_values(event):
+            battery.set_property(text='Battery: {} %'.format(self.drone.get_battery()))
+            height.set_property(
+                text='Height: {} ft'.format(round_places(self.drone.get_height_from_ground() * 0.0328084, 2)))
+            time.set_property(text='Time: {} s'.format(self.drone.flight_time.read()))
+
+        easy_draw.CANVAS.bind("<<update>>", update_values)
+
+        easy_draw.end()
 
     def initialize(self):
-        self.position = (0, 0, 0)
-        self.last_execute = None
+        self.thread = threading.Thread(target=self.run)
+        self.thread.start()
 
     def execute(self):
-        if self.last_execute is not None:
-            dt = time.time() - self.last_execute
-            speed = self.drone.mvo.read()
-            if speed is not None:
-                (x_speed, y_speed) = rotate((speed[0], speed[1]), self.drone.get_yaw())
-                self.position = (
-                    self.position[0] + x_speed * dt,
-                    self.position[1] + y_speed * dt,
-                    self.drone.get_height_from_start()
-                )
-                self.last_execute = time.time()
-        else:
-            self.last_execute = time.time()
-
-        if self.last_time is None or time.time() - self.last_time > 0.1:
-            self.last_time = time.time()
-            pos = (int(self.position[0]), int(self.position[1]), int(self.position[2]))
-            print("Time:", self.drone.flight_time.read(), "Height:", int(self.drone.get_height_from_ground()), "Bat:",
-                  self.drone.get_battery())
+        easy_draw.CANVAS.event_generate("<<update>>")
 
     def is_finished(self):
         return False

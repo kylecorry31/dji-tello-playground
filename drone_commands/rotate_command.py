@@ -1,13 +1,17 @@
 from commands.PIDCommand import PIDCommand
 from drone.drone import Drone
+from filter.pid import PID
 from utils import delta_angle
 
 
 class RotateCommand(PIDCommand):
 
     def __init__(self, drone: Drone, yaw: float, relative=True):
-        super().__init__(drone, self.get_yaw, self.set_velocity, yaw, p=0.05, threshold=1, relative=relative,
-                         timeout_fn=self.estimate_time, error_fn=self.calculate_error)
+        pid = PID(0.05, 0, 0)
+        pid.position_tolerance = 1
+        pid.error_fn = self.calculate_error
+        super().__init__(drone, self.get_yaw, self.set_velocity, yaw, pid=pid, relative=relative,
+                         timeout_fn=self.estimate_time)
         self.drone = drone
         self.relative = relative
 

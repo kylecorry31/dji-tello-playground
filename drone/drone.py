@@ -1,6 +1,13 @@
 import logging
 
 from drone.advanced.tello import Tello
+from drone.sensors.accelerometer import Accelerometer
+from drone.sensors.barometer import Barometer
+from drone.sensors.flight_time import FlightTime
+from drone.sensors.fused_altimeter import FusedAltimeter
+from drone.sensors.linear_accelerometer import LinearAccelerometer
+from drone.sensors.mvo import MVO
+from drone.sensors.tof import TOF
 from utils import delta_angle, rotate
 
 
@@ -12,10 +19,30 @@ class Drone:
         self.yaw = None
         self.last_yaw = 0
         self.start_height = 0
-        self.h = 0
-        self.last_barometer = None
+        self.barometer = Barometer(self.tello)
+        self.accelerometer = Accelerometer(self.tello)
+        self.mvo = MVO(self.tello)
+        self.tof = TOF(self.tello)
+        self.flight_time = FlightTime(self.tello)
+        self.altimeter = FusedAltimeter(self.tof, self.barometer, self.mvo, self.accelerometer, self.flight_time)
         print(self.tello.get_battery())
         print("READY")
+
+    def reset_sensors(self):
+        self.flight_time.reset()
+        self.barometer.reset()
+        self.accelerometer.reset()
+        self.mvo.reset()
+        self.tof.reset()
+        self.altimeter.reset()
+
+    def update_sensors(self):
+        self.flight_time.update()
+        self.barometer.update()
+        self.accelerometer.update()
+        self.mvo.update()
+        self.tof.update()
+        self.altimeter.update()
 
     def stream(self):
         self.tello.streamon()
@@ -75,37 +102,22 @@ class Drone:
         return self.tello.get_battery()
 
     def get_height_from_ground(self):
-        return self.h
+        return self.altimeter.read()
 
     def get_height_from_start(self):
         if self.start_height == 0:
-            self.start_height = self.tello.get_barometer()
-        return self.tello.get_barometer() - self.start_height
+            self.start_height = self.barometer.read()
+        return self.barometer.read() - self.start_height
 
     def get_height(self):
+        # TODO: Remove this
         return self.tello.get_height()
-
-    def get_tof(self):
-        return self.tello.get_distance_tof()
-
-    def get_barometer(self):
-        baro = self.tello.get_barometer()
-        if baro is not None and baro > 0:
-            if self.last_barometer is None:
-                self.last_barometer = baro
-            self.last_barometer = self.last_barometer * 0.95 + baro * 0.05
-        return self.last_barometer
 
     def emergency_stop(self):
         self.tello.emergency()
 
-    def get_speed(self):
-        return self.tello.get_speed_x(), self.tello.get_speed_y(), self.tello.get_speed_z()
-
-    def get_acceleration(self):
-        return self.tello.get_acceleration_x(), self.tello.get_acceleration_y(), self.tello.get_acceleration_z()
-
     def get_yaw(self):
+        # TODO: Extract this to a sensor
         if self.yaw is None:
             self.reset_heading()
         current_yaw = self.tello.get_yaw()
@@ -117,7 +129,7 @@ class Drone:
         return self.yaw
 
     def is_flying(self):
-        flying = self.get_height() > 0
+        flying = self.get_height() != 0
         self.tello.is_flying = flying
         return flying
 

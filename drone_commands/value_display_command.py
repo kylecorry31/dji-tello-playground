@@ -20,7 +20,7 @@ class ValueDisplayCommand(Command):
     def execute(self):
         if self.last_execute is not None:
             dt = time.time() - self.last_execute
-            speed = self.drone.get_speed()
+            speed = self.drone.mvo.read()
             if speed is not None:
                 (x_speed, y_speed) = rotate((speed[0], speed[1]), self.drone.get_yaw())
                 self.position = (
@@ -35,7 +35,8 @@ class ValueDisplayCommand(Command):
         if self.last_time is None or time.time() - self.last_time > 0.1:
             self.last_time = time.time()
             pos = (int(self.position[0]), int(self.position[1]), int(self.position[2]))
-            print(pos, int(self.drone.get_height_from_ground()), self.drone.get_battery())
+            print("Time:", self.drone.flight_time.read(), "Height:", int(self.drone.get_height_from_ground()), "Bat:",
+                  self.drone.get_battery())
 
     def is_finished(self):
         return False

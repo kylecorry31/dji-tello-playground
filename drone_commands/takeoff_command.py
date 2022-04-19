@@ -11,6 +11,7 @@ class TakeoffCommand(Command):
     def initialize(self):
         if self.is_finished():
             return
+        self.drone.start_height = 0
         self.drone.takeoff()
 
     def is_finished(self):

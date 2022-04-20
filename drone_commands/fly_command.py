@@ -16,9 +16,7 @@ class FlyCommand(Command):
         self.is_field_oriented = False
         self.last_thumb = False
         self.maintain_height = None
-        self.maintain_pid = PID(0.05, 0.01, 0.15)
-        self.maintain_pid.integrator_range = 10
-        self.maintain_pid.integrator_limit = 0.25
+        self.maintain_pid = PID(0.03, 0.0, 0.05)
         self.last_time = None
 
     def initialize(self):

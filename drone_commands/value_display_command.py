@@ -32,27 +32,17 @@ class ValueDisplayCommand(Command):
             center_xy=(100, start + spacing * 2),
             size=12
         )
-        position = easy_draw.Text(
-            center_xy=(100, start + spacing * 3),
-            size=12
-        )
         yaw = easy_draw.Text(
-            center_xy=(100, start + spacing * 4),
+            center_xy=(100, start + spacing * 3),
             size=12
         )
 
         def update_values(event):
-            pos = self.drone.position.read()
             CM_TO_FT = 0.0328084
             battery.set_property(text='Battery: {} %'.format(self.drone.get_battery()))
             height.set_property(
                 text='Height: {} ft'.format(round_places(self.drone.altimeter.read() * CM_TO_FT, 2)))
             time.set_property(text='Time: {} s'.format(self.drone.flight_time.read()))
-            position.set_property(text='Pos: {}, {}, {}'.format(
-                round_places(pos[0] * CM_TO_FT, 2),
-                round_places(pos[1] * CM_TO_FT, 2),
-                round_places(pos[2] * CM_TO_FT, 2),
-            ))
             yaw.set_property(text='Yaw: {}'.format(self.drone.compass.read()))
 
         easy_draw.CANVAS.bind("<<update>>", update_values)

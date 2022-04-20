@@ -49,15 +49,15 @@ class TelloSDK:
 
     def move_x(self, x: int, listener=None):
         if x > 0:
-            self.command_conn.send(sdk.left(x), response_listener=self.__create_ok_callback(listener))
+            self.command_conn.send(sdk.forward(x), response_listener=self.__create_ok_callback(listener))
         else:
-            self.command_conn.send(sdk.right(-x), response_listener=self.__create_ok_callback(listener))
+            self.command_conn.send(sdk.back(-x), response_listener=self.__create_ok_callback(listener))
 
     def move_y(self, y: int, listener=None):
         if y > 0:
-            self.command_conn.send(sdk.forward(y), response_listener=self.__create_ok_callback(listener))
+            self.command_conn.send(sdk.left(y), response_listener=self.__create_ok_callback(listener))
         else:
-            self.command_conn.send(sdk.back(-y), response_listener=self.__create_ok_callback(listener))
+            self.command_conn.send(sdk.right(-y), response_listener=self.__create_ok_callback(listener))
 
     def move_z(self, z: int, listener=None):
         if z > 0:
@@ -73,7 +73,7 @@ class TelloSDK:
 
     def go(self, x: int, y: int, z: int, speed: float, listener=None):
         s = self.__percent(speed)
-        self.command_conn.send(sdk.go(x, y, z, s), response_listener=self.__create_ok_callback(listener))
+        self.command_conn.send(sdk.go(y, x, z, s), response_listener=self.__create_ok_callback(listener))
 
     def curve(self, x1: int, y1: int, z1: int, x2: int, y2: int, z2: int, speed: float, listener=None):
         s = self.__percent(speed)

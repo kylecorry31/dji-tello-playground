@@ -45,7 +45,7 @@ def autonomous():
 def teleop():
     controller = XboxController(0)
     controller.when_pressed(A, ToggleFlightCommand(drone))
-    controller.when_pressed(X, HomeCommand(drone))
+    controller.when_pressed(X, FlyToCommand(drone, 0, 200, 80, 1))
     controller.when_pressed(B, RotateCommand(drone, 90))
     controller.when_pressed(LEFT_THUMB, ResetHeadingCommand(drone))
     controller.when_pressed(DPAD_UP, FlipCommand(drone, FlipFront))

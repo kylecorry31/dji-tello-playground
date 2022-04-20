@@ -1,9 +1,9 @@
-from drone.advanced.tello2 import Tello2
+from drone.advanced.tello_sdk import TelloSDK
 
 
 class SimpleDrone:
     def __init__(self):
-        self.tello = Tello2()
+        self.tello = TelloSDK(print_responses=True)
         self.tello.command()
         self.tello.set_stream(True)
         print("READY")
@@ -22,3 +22,9 @@ class SimpleDrone:
 
     def fly(self, x, y, z, yaw, field_oriented=False, fast_mode=False):
         self.tello.rc(x, y, z, yaw)
+
+    def go(self, x, listener=None):
+        self.tello.move_y(x, listener)
+
+    def emergency_stop(self):
+        self.tello.emergency()

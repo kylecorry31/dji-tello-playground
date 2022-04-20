@@ -24,13 +24,13 @@ class UdpConnection:
         self.__response_listeners = []
         self.__response_buffer_size = response_buffer_size
         self.__print_responses = print_responses
+        self.__running = True
 
         self.__receive_thread = threading.Thread(target=self.__receiver)
         self.__receive_thread.daemon = True
         if response_port is not None:
             self.__receive_thread.start()
 
-        self.__running = True
 
     def __receiver(self):
         while self.__running:

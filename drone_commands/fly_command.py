@@ -16,7 +16,7 @@ class FlyCommand(Command):
         self.last_d_up = False
 
     def execute(self):
-        d_up = self.controller.get_button(BACK)
+        d_up = self.controller.get_button(LEFT_THUMB)
         if d_up != self.last_d_up and d_up:
             self.is_field_oriented = not self.is_field_oriented
             print("Field oriented?:", self.is_field_oriented)

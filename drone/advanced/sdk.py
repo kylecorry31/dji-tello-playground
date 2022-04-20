@@ -66,10 +66,6 @@ def ccw(x: int) -> bytes:
     return __bytes("ccw {}".format(x))
 
 
-def flip(x: chr) -> bytes:
-    return __bytes("flip {}".format(x))
-
-
 def go(x: int, y: int, z: int, speed: int) -> bytes:
     return __bytes("go {} {} {} {}".format(x, y, z, speed))
 

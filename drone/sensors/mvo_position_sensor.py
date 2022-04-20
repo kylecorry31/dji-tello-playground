@@ -19,10 +19,10 @@ class MVOPositionSensor(Sensor):
         speed = self.mvo.read()
         if speed is None:
             return
-        (speed_x, speed_y) = rotate((speed[1], speed[2]), self.compass.read())
+        (speed_y, speed_x) = rotate((speed[1], speed[2]), self.compass.read())
         self.pos = (
-            self.pos[0] + speed_x * dt,
-            self.pos[1] + speed_y * dt,
+            self.pos[0] - speed_x * dt,
+            self.pos[1] - speed_y * dt,
             self.pos[2] - speed[2] * dt
         )
 

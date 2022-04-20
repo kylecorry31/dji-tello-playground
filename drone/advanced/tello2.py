@@ -1,5 +1,5 @@
 from drone.advanced import sdk
-from drone.advanced.connection import Connection
+from drone.advanced.udp_connection import UdpConnection
 from drone.advanced.tello_state import parse_state, empty_state
 from utils import clamp
 
@@ -7,9 +7,9 @@ from utils import clamp
 class Tello2:
     def __init__(self):
         self.state = empty_state()
-        self.command_conn = Connection('192.168.10.1', 8889, 8889)
-        self.state_conn = Connection('192.168.10.1', 8889, 8890)
-        self.video_conn = Connection('192.168.10.1', 8889, 11111, response_buffer_size=2048)
+        self.command_conn = UdpConnection('192.168.10.1', 8889, 8889)
+        self.state_conn = UdpConnection('192.168.10.1', 8889, 8890)
+        self.video_conn = UdpConnection('192.168.10.1', 8889, 11111, response_buffer_size=2048)
         # TODO: Expose a way to listen for frames
         self.state_conn.listen(self.__state_listener)
 
@@ -68,6 +68,9 @@ class Tello2:
     def curve(self, x1: int, y1: int, z1: int, x2: int, y2: int, z2: int, speed: float):
         s = self.__percent(speed)
         self.command_conn.send(sdk.curve(x1, y1, z1, x2, y2, z2, s))
+
+    def flip(self, direction: chr):
+        self.command_conn.send(sdk.flip(direction))
 
     def get_state(self):
         return self.state

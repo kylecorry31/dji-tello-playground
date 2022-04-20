@@ -1,7 +1,7 @@
 import struct
 
 from drone.advanced.protocol import Packet
-from drone.advanced.utils import le16, byte
+from drone.advanced.utils import le16, byte, float_to_hex
 
 
 def connection_request() -> bytes:
@@ -77,9 +77,52 @@ def flip(direction: int) -> bytes:
     return pkt.buf
 
 
-def set_video_mode(zoom: bool) -> bytes:
+def set_video_mode(wide: bool) -> bytes:
     cmd = 0x0031
     pkt = Packet(cmd)
-    pkt.add_byte(int(zoom))
+    pkt.add_byte(int(wide))
+    pkt.fixup()
+    return pkt.buf
+
+
+def throw_and_go() -> bytes:
+    cmd = 0x005d
+    pkt = Packet(cmd, 0x48)
+    pkt.add_byte(0x00)
+    pkt.fixup()
+    return pkt.buf
+
+
+def palm_land() -> bytes:
+    cmd = 0x005e
+    pkt = Packet(cmd)
+    pkt.add_byte(0x00)
+    pkt.fixup()
+    return pkt.buf
+
+
+def set_attitude_limit(limit: int) -> bytes:
+    cmd = 0x1058
+    pkt = Packet(cmd)
+    pkt.add_byte(0x00)
+    pkt.add_byte(0x00)
+    pkt.add_byte(int(float_to_hex(float(limit))[4:6], 16))
+    pkt.add_byte(0x41)
+    pkt.fixup()
+    return pkt.buf
+
+
+def set_exposure(exposure: int) -> bytes:
+    cmd = 0x0034
+    pkt = Packet(cmd, 0x48)
+    pkt.add_byte(exposure)
+    pkt.fixup()
+    return pkt.buf
+
+
+def set_video_encoder_rate(rate: int) -> bytes:
+    cmd = 0x0020
+    pkt = Packet(cmd, 0x68)
+    pkt.add_byte(rate)
     pkt.fixup()
     return pkt.buf

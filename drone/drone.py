@@ -14,10 +14,9 @@ from utils import rotate
 
 class Drone:
     def __init__(self):
-        self.tello = TelloSDK(print_responses=False)
+        self.tello = TelloSDK(print_responses=True)
         self.tello.command()
         self.tello.set_stream(True)
-        self.tello.set_video_mode(True)
         self.tello.set_altitude_limit(30)
         self.__was_fast_mode = False
         while not self.tello.has_valid_state():
@@ -56,11 +55,17 @@ class Drone:
         self.altimeter.update()
         self.position.update()
 
-    def land(self):
-        self.tello.land()
+    def land(self, palm: bool = False):
+        if palm:
+            self.tello.palm_land()
+        else:
+            self.tello.land()
 
-    def takeoff(self):
-        self.tello.takeoff()
+    def takeoff(self, throw: bool = False):
+        if throw:
+            self.tello.throw_and_go()
+        else:
+            self.tello.takeoff(True)
 
     def is_flying(self):
         return self.tello.get_state().h != 0

@@ -4,15 +4,13 @@ from drone.drone import Drone
 
 class TakeoffCommand(Command):
 
-    def __init__(self, drone: Drone):
+    def __init__(self, drone: Drone, throw: bool = False):
         super().__init__(drone)
         self.drone = drone
+        self.throw = throw
 
     def initialize(self):
-        if self.is_finished():
-            return
-        self.drone.start_height = 0
-        self.drone.takeoff()
+        self.drone.takeoff(self.throw)
 
     def is_finished(self):
         return self.drone.is_flying()

@@ -34,6 +34,7 @@ class UdpConnection:
     def connect(self):
         if self.__running or self.__response_port is None:
             return
+        self.__running = True
         self.__socket.bind(('', self.__response_port))
         self.__receive_thread.start()
 

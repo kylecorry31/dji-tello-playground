@@ -10,10 +10,10 @@ class TelloSDK:
         self.__has_valid_state = False
         self.command_conn = UdpConnection('192.168.10.1', 8889, 8889)
         self.state_conn = UdpConnection('192.168.10.1', 8889, 8890)
-        self.video_conn = None
         if print_responses:
             self.command_conn.listen(self.__test_listener)
         self.state_conn.listen(self.__state_listener)
+        self.video_conn = UdpConnection('192.168.10.1', 8889, 11111, response_buffer_size=2048, auto_connect=False)
 
     def command(self):
         ret = self.command_conn.send(sdk.command(), wait=True)
@@ -34,8 +34,7 @@ class TelloSDK:
                                       self.__percent(yaw)))
 
     def video(self, listener):
-        if self.video_conn is None:
-            self.video_conn = UdpConnection('192.168.10.1', 8889, 11111, response_buffer_size=2048)
+        self.video_conn.connect()
         self.video_conn.listen(listener)
 
     def set_stream(self, is_on: bool):

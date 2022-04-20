@@ -5,7 +5,7 @@ import time
 
 class UdpConnection:
     def __init__(self, request_ip: str, request_port: int, response_port: int, response_buffer_size: int = 1024,
-                 print_responses: bool = False):
+                 print_responses: bool = False, auto_connect: bool = True):
         """
         A two-way UDP connection
         :param request_ip: The IP address to send data to. If only receiving, this can be None.
@@ -13,24 +13,29 @@ class UdpConnection:
         :param response_port: The UDP port to receive data from. If only sending, this can be None.
         :param response_buffer_size: The buffer size to receive responses. Defaults to 1024 bytes.
         :param print_responses: Set to True to print responses (data and addresses). Defaults to False.
+        :param auto_connect: Determines whether to automatically connect (receiver) to the UDP socket. Defaults to True
         """
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        if response_port is not None:
-            self.__socket.bind(('', response_port))
         self.__request_address = (request_ip, request_port)
 
-        # Receiver thread
+        # Receiver
         self.__response = None
         self.__response_listeners = []
+        self.__response_port = response_port
         self.__response_buffer_size = response_buffer_size
         self.__print_responses = print_responses
-        self.__running = True
+        self.__running = False
 
         self.__receive_thread = threading.Thread(target=self.__receiver)
         self.__receive_thread.daemon = True
-        if response_port is not None:
-            self.__receive_thread.start()
+        if auto_connect:
+            self.connect()
 
+    def connect(self):
+        if self.__running or self.__response_port is None:
+            return
+        self.__socket.bind(('', self.__response_port))
+        self.__receive_thread.start()
 
     def __receiver(self):
         while self.__running:

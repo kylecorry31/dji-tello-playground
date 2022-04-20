@@ -22,4 +22,4 @@ class HeightCommand(PIDCommand):
         return abs(error) / 65
 
     def get_height(self):
-        return self.drone.get_height_from_ground()
+        return self.drone.altimeter.read()

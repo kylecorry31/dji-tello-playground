@@ -7,10 +7,9 @@ from drone_commands import *
 from controller.xbox_controller import *
 from drone_commands.HomeCommand import HomeCommand
 from drone_commands.emergency_command import EmergencyCommand
-from drone_commands.flip_backward_command import FlipBackwardCommand
-from drone_commands.flip_forward_command import FlipForwardCommand
 from drone_commands.sensor_update_command import SensorUpdateCommand
 from drone_commands.value_display_command import ValueDisplayCommand
+from drone.advanced.flips import *
 
 
 def exception_handler(exctype, value, tb):
@@ -49,10 +48,10 @@ def teleop():
     controller.when_pressed(X, HomeCommand(drone))
     controller.when_pressed(B, RotateCommand(drone, 90))
     controller.when_pressed(LEFT_THUMB, ResetHeadingCommand(drone))
-    controller.when_pressed(DPAD_UP, FlipForwardCommand(drone))
-    controller.when_pressed(DPAD_DOWN, FlipBackwardCommand(drone))
-    controller.when_pressed(DPAD_LEFT, FlipLeftCommand(drone))
-    controller.when_pressed(DPAD_RIGHT, FlipRightCommand(drone))
+    controller.when_pressed(DPAD_UP, FlipCommand(drone, FlipFront))
+    controller.when_pressed(DPAD_DOWN, FlipCommand(drone, FlipBack))
+    controller.when_pressed(DPAD_LEFT, FlipCommand(drone, FlipLeft))
+    controller.when_pressed(DPAD_RIGHT, FlipCommand(drone, FlipRight))
     height = HeightCommand(drone, 121.9, False)
     controller.while_held(LB, height)
     controller.when_pressed(BACK, EmergencyCommand(drone))

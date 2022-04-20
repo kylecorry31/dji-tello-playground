@@ -46,7 +46,7 @@ class ValueDisplayCommand(Command):
             CM_TO_FT = 0.0328084
             battery.set_property(text='Battery: {} %'.format(self.drone.get_battery()))
             height.set_property(
-                text='Height: {} ft'.format(round_places(self.drone.get_height_from_ground() * CM_TO_FT, 2)))
+                text='Height: {} ft'.format(round_places(self.drone.altimeter.read() * CM_TO_FT, 2)))
             time.set_property(text='Time: {} s'.format(self.drone.flight_time.read()))
             position.set_property(text='Pos: {}, {}, {}'.format(
                 round_places(pos[0] * CM_TO_FT, 2),
@@ -54,7 +54,6 @@ class ValueDisplayCommand(Command):
                 round_places(pos[2] * CM_TO_FT, 2),
             ))
             yaw.set_property(text='Yaw: {}'.format(self.drone.compass.read()))
-
 
         easy_draw.CANVAS.bind("<<update>>", update_values)
 

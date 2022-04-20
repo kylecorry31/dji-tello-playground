@@ -1,17 +1,19 @@
 from commands.command import Command
-from drone.drone import Drone
 import time
 
+from drone.drone import Drone
 
-class FlipRightCommand(Command):
 
-    def __init__(self, drone: Drone):
+class FlipCommand(Command):
+
+    def __init__(self, drone: Drone, direction: int):
         super().__init__(drone)
         self.drone = drone
         self.start_time = None
+        self.direction = direction
 
     def initialize(self):
-        self.drone.flip_right()
+        self.drone.flip(self.direction)
         self.start_time = time.time()
 
     def is_finished(self):

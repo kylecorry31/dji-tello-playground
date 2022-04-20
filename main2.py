@@ -1,20 +1,15 @@
-import sys
-
-import cv2
-
-from drone.simple_drone import SimpleDrone
-from drone_commands import *
 from controller.xbox_controller import *
+from drone.drone import Drone
+from drone_commands import *
 from drone_commands.emergency_command import EmergencyCommand
-from drone_commands.test_command import TestCommand
 
-drone = SimpleDrone()
+drone = Drone()
 runner = CommandRunner.get_instance()
+runner.schedule(ShowVideoCommand(drone))
 
 
 def teleop():
     controller = XboxController(0)
-    controller.when_pressed(B, TestCommand(drone))
     controller.when_pressed(A, ToggleFlightCommand(drone))
     controller.when_pressed(BACK, EmergencyCommand(drone))
     controller.while_held(START, StopCommand(drone))

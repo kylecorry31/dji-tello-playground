@@ -1,6 +1,6 @@
-import logging
+import time
 
-from drone.advanced.tello import Tello
+from drone.advanced.tello_sdk import TelloSDK
 from drone.sensors.accelerometer import Accelerometer
 from drone.sensors.barometer import Barometer
 from drone.sensors.compass import Compass
@@ -14,10 +14,14 @@ from utils import rotate
 
 class Drone:
     def __init__(self):
-        self.tello = Tello()
-        self.tello.LOGGER.setLevel(logging.ERROR)
-        self.tello.connect()
-        self.start_height = 0
+        self.tello = TelloSDK(print_responses=False)
+        self.tello.command()
+        self.tello.set_stream(True)
+        self.tello.set_video_mode(True)
+        self.tello.set_altitude_limit(30)
+        self.__was_fast_mode = False
+        while not self.tello.has_valid_state():
+            time.sleep(0.1)
         self.barometer = Barometer(self.tello)
         self.accelerometer = Accelerometer(self.tello)
         self.mvo = MVO(self.tello)
@@ -26,8 +30,11 @@ class Drone:
         self.compass = Compass(self.tello)
         self.position = MVOPositionSensor(self.mvo, self.compass)
         self.altimeter = FusedAltimeter(self.tof, self.barometer, self.mvo, self.accelerometer, self.flight_time)
-        print(self.tello.get_battery())
+        print(self.get_battery())
         print("READY")
+
+    def get_battery(self):
+        return self.tello.get_state().bat
 
     def reset_sensors(self):
         self.compass.reset()
@@ -49,94 +56,37 @@ class Drone:
         self.altimeter.update()
         self.position.update()
 
-    def stream(self):
-        self.tello.streamon()
-
     def land(self):
         self.tello.land()
 
     def takeoff(self):
-        self.tello.remove_altitude_limit()
-        self.tello.send_command_without_return("takeoff")
-        self.tello.is_flying = True
+        self.tello.takeoff()
 
-    def flip_forward(self):
-        self.tello.flip_forward()
-
-    def flip_back(self):
-        self.tello.flip_back()
-
-    def flip_right(self):
-        self.tello.flip_right()
-
-    def flip_left(self):
-        self.tello.flip_left()
-
-    def flip_forwardleft(self):
-        self.tello.flip_forwardleft()
-
-    def flip_backleft(self):
-        self.tello.flip_backleft()
-
-    def flip_forwardright(self):
-        self.tello.flip_forwardright()
-
-    def flip_backright(self):
-        self.tello.flip_backright()
+    def is_flying(self):
+        return self.tello.get_state().h != 0
 
     def stop(self):
         self.fly(0, 0, 0, 0)
 
+    def disconnect(self):
+        self.tello.disconnect()
+
     def fly(self, x, y, z, yaw, field_oriented=False, fast_mode=False):
         if field_oriented:
-            rotated = rotate((x, y), self.get_yaw())
+            rotated = rotate((x, y), self.compass.read())
             x = rotated[0]
             y = rotated[1]
-        self.tello.send_rc_control(int(x * 100), int(y * 100), int(z * 100), int(yaw * 100), fast_mode)
+        if fast_mode or self.__was_fast_mode:
+            self.tello.stick(x, y, z, yaw, fast_mode)
+        else:
+            self.tello.rc(x, y, z, yaw)
+        self.__was_fast_mode = fast_mode
 
-    def disconnect(self):
-        self.tello.end()
-
-    def get_video(self):
-        return self.tello.get_video_capture()
-
-    def get_frame(self):
-        return self.tello.get_frame_read().frame
-
-    def get_battery(self):
-        return self.tello.get_battery()
-
-    def get_height_from_ground(self):
-        return self.altimeter.read()
-
-    def get_height_from_start(self):
-        if self.start_height == 0:
-            self.start_height = self.barometer.read()
-        return self.barometer.read() - self.start_height
-
-    def get_height(self):
-        # TODO: Remove this
-        return self.tello.get_height()
+    def go(self, x, y, z, speed, listener=None):
+        self.tello.go(x, y, z, speed, listener)
 
     def emergency_stop(self):
         self.tello.emergency()
 
-    def get_yaw(self):
-        return self.compass.read()
-
-    def is_flying(self):
-        flying = self.get_height() != 0
-        self.tello.is_flying = flying
-        return flying
-
-    def fly_to(self, x, y, z, speed):
-        self.tello.go_xyz_speed(int(x), int(y), int(z), int(speed * 100))
-
-    def rotate(self, yaw):
-        if yaw < 0:
-            self.tello.rotate_counter_clockwise(-int(yaw))
-        else:
-            self.tello.rotate_clockwise(int(yaw))
-
-    def reset_heading(self):
-        self.compass.reset()
+    def flip(self, direction: int):
+        self.tello.flip(direction)

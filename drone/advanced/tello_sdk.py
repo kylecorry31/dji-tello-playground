@@ -1,4 +1,4 @@
-from drone.advanced import sdk
+from drone.advanced import sdk, proc
 from drone.advanced.udp_connection import UdpConnection
 from drone.advanced.tello_state import parse_state, empty_state
 from utils import clamp
@@ -6,19 +6,22 @@ from utils import clamp
 
 class TelloSDK:
     def __init__(self, print_responses=False):
-        self.state = empty_state()
+        self.__state = empty_state()
+        self.__has_valid_state = False
         self.command_conn = UdpConnection('192.168.10.1', 8889, 8889)
         self.state_conn = UdpConnection('192.168.10.1', 8889, 8890)
-        self.video_conn = UdpConnection('192.168.10.1', 8889, 11111, response_buffer_size=2048)
+        self.video_conn = None
         if print_responses:
             self.command_conn.listen(self.__test_listener)
-        # TODO: Expose a way to listen for frames
         self.state_conn.listen(self.__state_listener)
 
     def command(self):
         ret = self.command_conn.send(sdk.command(), wait=True)
         if ret is None or ret is sdk.error():
             raise Exception("Could not connect to Tello")
+
+    def set_altitude_limit(self, limit: int):
+        self.command_conn.send(proc.altitude_limit(limit))
 
     def takeoff(self, listener=None):
         self.command_conn.send(sdk.takeoff(), response_listener=self.__create_ok_callback(listener))
@@ -29,6 +32,11 @@ class TelloSDK:
     def rc(self, x: float, y: float, z: float, yaw: float):
         self.command_conn.send(sdk.rc(self.__percent(x), self.__percent(y), self.__percent(z),
                                       self.__percent(yaw)))
+
+    def video(self, listener):
+        if self.video_conn is None:
+            self.video_conn = UdpConnection('192.168.10.1', 8889, 11111, response_buffer_size=2048)
+        self.video_conn.listen(listener)
 
     def set_stream(self, is_on: bool):
         if is_on:
@@ -71,6 +79,18 @@ class TelloSDK:
         s = self.__percent(speed)
         self.command_conn.send(sdk.curve(x1, y1, z1, x2, y2, z2, s),
                                response_listener=self.__create_ok_callback(listener))
+
+    def flip(self, direction: int):
+        self.command_conn.send(proc.flip(direction))
+
+    def set_video_mode(self, zoom: bool):
+        self.command_conn.send(proc.set_video_mode(zoom))
+
+    def disconnect(self):
+        self.command_conn.cancel()
+        self.state_conn.cancel()
+        if self.video_conn is not None:
+            self.video_conn.cancel()
 
     def __create_ok_callback(self, listener):
         def __callback(value: bytes, _):
@@ -122,11 +142,19 @@ class TelloSDK:
     def read_wifi(self) -> float:
         return self.__read_value(sdk.read_wifi())
 
+    def has_valid_state(self):
+        return self.__has_valid_state
+
     def get_state(self):
-        return self.state
+        return self.__state
+
+    def stick(self, x: float, y: float, z: float, yaw: float, fast_mode: bool):
+        self.command_conn.send(
+            proc.stick(self.__percent(x), self.__percent(y), self.__percent(z), self.__percent(yaw), fast_mode))
 
     def __state_listener(self, value: bytes, _):
-        self.state = parse_state(value)
+        self.__state = parse_state(value)
+        self.__has_valid_state = True
         return True
 
     def __test_listener(self, value: bytes, _):

@@ -1,8 +1,9 @@
 import math
 
 from commands.command import Command
-from drone.drone import Drone
 import time
+
+from drone.drone import Drone
 
 
 class FlyToCommand(Command):
@@ -19,7 +20,7 @@ class FlyToCommand(Command):
         self.estimated_time = distance / (speed * 100)
 
     def initialize(self):
-        self.drone.fly_to(self.x, self.y, self.z, self.speed)
+        self.drone.go(self.x, self.y, self.z, self.speed)
         self.start_time = time.time()
 
     def is_finished(self):

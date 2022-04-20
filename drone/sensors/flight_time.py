@@ -1,24 +1,24 @@
 import time
 
-from drone.advanced.tello import Tello
+from drone.advanced.tello_sdk import TelloSDK
 from drone.sensors.sensor import Sensor
 
 
 class FlightTime(Sensor):
-    def __init__(self, tello: Tello):
+    def __init__(self, tello: TelloSDK):
         self.tello = tello
         self.last_flight_time = 0
         self.last_flight_time_change = 0
         self.previous_flight_time = 0
 
     def reset(self):
-        self.previous_flight_time = self.tello.get_flight_time()
+        self.previous_flight_time = self.__get_flight_time()
 
     def read(self):
-        return self.tello.get_flight_time() - self.previous_flight_time
+        return self.__get_flight_time() - self.previous_flight_time
 
     def update(self):
-        t = self.tello.get_flight_time()
+        t = self.__get_flight_time()
         if t != self.last_flight_time or self.last_flight_time_change == 0:
             self.last_flight_time_change = time.time()
 
@@ -26,3 +26,6 @@ class FlightTime(Sensor):
             self.previous_flight_time = t
 
         self.last_flight_time = t
+
+    def __get_flight_time(self):
+        return self.tello.get_state().time

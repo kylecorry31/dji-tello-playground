@@ -1,11 +1,12 @@
-from drone.advanced.tello import Tello
+from drone.advanced.tello_sdk import TelloSDK
 from drone.sensors.sensor import Sensor
 
 
 class MVO(Sensor):
 
-    def __init__(self, tello: Tello):
+    def __init__(self, tello: TelloSDK):
         self.tello = tello
 
     def read(self):
-        return self.tello.get_speed_x() * 10, self.tello.get_speed_y() * 10, self.tello.get_speed_z() * 10
+        state = self.tello.get_state()
+        return state.vgx * 10, state.vgy * 10, state.vgz * 10

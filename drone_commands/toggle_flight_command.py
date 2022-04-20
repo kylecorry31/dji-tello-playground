@@ -1,6 +1,5 @@
 from commands import ConditionalCommand
 from drone.drone import Drone
-
 from drone_commands.land_command import LandCommand
 from drone_commands.takeoff_command import TakeoffCommand
 

@@ -9,7 +9,7 @@ class ResetHeadingCommand(Command):
         self.drone = drone
 
     def initialize(self):
-        self.drone.reset_heading()
+        self.drone.compass.reset()
 
     def is_finished(self):
         return True

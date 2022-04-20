@@ -22,7 +22,7 @@ class RotateCommand(PIDCommand):
         return abs(error) / 65
 
     def get_yaw(self):
-        return self.drone.get_yaw()
+        return self.drone.compass.read()
 
     def calculate_error(self, target, current):
         if self.relative:

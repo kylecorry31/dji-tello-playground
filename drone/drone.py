@@ -32,6 +32,9 @@ class Drone:
         print(self.get_battery())
         print("READY")
 
+    def get_wifi(self, callback=None):
+        return self.tello.read_wifi(callback)
+
     def get_battery(self):
         return self.tello.get_state().bat
 

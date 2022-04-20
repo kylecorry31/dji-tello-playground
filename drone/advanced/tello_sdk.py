@@ -100,35 +100,35 @@ class TelloSDK:
         if self.__video_conn is not None:
             self.__video_conn.cancel()
 
-    def read_speed(self) -> float:
-        return self.__read_value(sdk.read_speed())
+    def read_speed(self, callback=None) -> float:
+        return self.__read_value(sdk.read_speed(), callback)
 
-    def read_battery(self) -> float:
-        return self.__read_value(sdk.read_battery())
+    def read_battery(self, callback=None) -> float:
+        return self.__read_value(sdk.read_battery(), callback)
 
-    def read_time(self) -> float:
-        return self.__read_value(sdk.read_time())
+    def read_time(self, callback=None) -> float:
+        return self.__read_value(sdk.read_time(), callback)
 
-    def read_height(self) -> float:
-        return self.__read_value(sdk.read_height())
+    def read_height(self, callback=None) -> float:
+        return self.__read_value(sdk.read_height(), callback)
 
-    def read_temp(self) -> float:
-        return self.__read_value(sdk.read_temp())
+    def read_temp(self, callback=None) -> float:
+        return self.__read_value(sdk.read_temp(), callback)
 
     def read_attitude(self) -> (float, float, float):
         return self.__read_vector(sdk.read_attitude())
 
-    def read_baro(self) -> float:
-        return self.__read_value(sdk.read_baro())
+    def read_baro(self, callback=None) -> float:
+        return self.__read_value(sdk.read_baro(), callback)
 
     def read_acceleration(self) -> (float, float, float):
         return self.__read_vector(sdk.read_acceleration())
 
-    def read_tof(self) -> float:
-        return self.__read_value(sdk.read_tof())
+    def read_tof(self, callback=None) -> float:
+        return self.__read_value(sdk.read_tof(), callback)
 
-    def read_wifi(self) -> float:
-        return self.__read_value(sdk.read_wifi())
+    def read_wifi(self, callback=None) -> float:
+        return self.__read_value(sdk.read_wifi(), callback)
 
     def has_valid_state(self):
         return self.__has_valid_state
@@ -148,8 +148,19 @@ class TelloSDK:
 
         return __callback
 
-    def __read_value(self, cmd: bytes) -> float:
-        return float(self.__command_conn.send(cmd, wait=True).decode('utf-8'))
+    def __create_value_callback(self, listener):
+        def __callback(value: bytes, _):
+            if listener is not None:
+                listener(float(value.decode('utf-8')))
+            return False
+
+        return __callback
+
+    def __read_value(self, cmd: bytes, callback=None) -> float:
+        if callback is None:
+            return float(self.__command_conn.send(cmd, wait=True).decode('utf-8'))
+        else:
+            self.__command_conn.send(cmd, response_listener=self.__create_value_callback(callback))
 
     def __read_vector(self, cmd: bytes) -> (float, float, float):
         value = self.__command_conn.send(cmd, wait=True)

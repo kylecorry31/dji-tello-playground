@@ -56,9 +56,7 @@ class __EasyDrawError(Exception):
         super().__init__(self.message)
 
 
-print("Welcome to Easy Draw! -- version 1.1.1 -- https://easy-draw.joemazzone.net/")
 os = platform.system()
-print("Your OS is identified as " + os)
 WINDOW = None
 CANVAS = None
 GRID_LINES = []

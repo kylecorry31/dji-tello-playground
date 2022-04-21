@@ -4,7 +4,6 @@ from drone_commands.auto_test_command import AutoTestCommand
 from drone_commands.fly_to_command import FlyToCommand
 from drone_commands.height_command import HeightCommand
 from drone_commands.land_command import LandCommand
-from drone_commands.reset_heading_command import ResetHeadingCommand
 from drone_commands.rotate_command import RotateCommand
 from drone_commands.show_video_command import ShowVideoCommand
 from drone_commands.stop_command import StopCommand
@@ -21,5 +20,4 @@ RotateCommand = RotateCommand
 LandCommand = LandCommand
 TakeoffCommand = TakeoffCommand
 AutoTestCommand = AutoTestCommand
-ResetHeadingCommand = ResetHeadingCommand
 HeightCommand = HeightCommand

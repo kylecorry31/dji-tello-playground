@@ -15,13 +15,18 @@ class ConditionalCommand(Command):
             self.command = self.on_true
         else:
             self.command = self.on_false
-        self.command.initialize()
+        if self.command is not None:
+            self.command.initialize()
 
     def execute(self):
-        self.command.execute()
+        if self.command is not None:
+            self.command.execute()
 
     def end(self, interrupted):
-        self.command.end(interrupted)
+        if self.command is not None:
+            self.command.end(interrupted)
 
     def is_finished(self):
+        if self.command is None:
+            return True
         return self.command.is_finished()

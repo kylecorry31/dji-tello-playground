@@ -21,19 +21,22 @@ class AltitudeHoldModule(FlyModule):
     def run(self, x: float, y: float, z: float, yaw: float, fast_mode: bool) -> (float, float, float, float, bool):
         return x, y, self.__get_z(z), yaw, fast_mode
 
+    def __can_run(self, altitude: float) -> bool:
+        return 10 < altitude < 1000
+
     def __get_z(self, user):
         dt = time.time() - self.last_time
         self.last_time = time.time()
 
         # If the user is not moving, maintain the height
-        if abs(user) < 0.1 and self.maintain_height is not None:
+        if abs(user) < 0.1 and self.maintain_height is not None and self.__can_run(self.altimeter.read()):
             return self.maintain_pid.calculate(self.altimeter.read(), self.maintain_height, dt)
 
         # If the user is moving up/down, set the new maintain height
         self.maintain_height = self.altimeter.read()
 
         # Don't maintain height if it is too high or low
-        if self.maintain_height <= 10 or self.maintain_height > 1000:
+        if not self.__can_run(self.maintain_height):
             self.maintain_height = None
 
         return user

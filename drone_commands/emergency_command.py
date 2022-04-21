@@ -11,10 +11,11 @@ class EmergencyCommand(Command):
         self.last_activate = None
 
     def initialize(self):
+        self.drone.stop()
         if self.last_activate is None:
             self.last_activate = time.time()
             return
-        if time.time() - self.last_activate < 2:
+        if time.time() - self.last_activate < 1:
             self.drone.emergency_stop()
         self.last_activate = time.time()
 

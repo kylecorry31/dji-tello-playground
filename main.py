@@ -7,6 +7,8 @@ from drone_commands import *
 from controller.xbox_controller import *
 from drone_commands.emergency_command import EmergencyCommand
 from drone_commands.sensor_update_command import SensorUpdateCommand
+from drone_commands.toggle_altitude_hold_command import ToggleAltitudeHoldCommand
+from drone_commands.toggle_headless_command import ToggleHeadlessCommand
 from drone_commands.value_display_command import ValueDisplayCommand
 from drone.advanced.flips import *
 
@@ -42,20 +44,48 @@ def autonomous():
 
 
 def teleop():
-    controller = XboxController(0)
-    controller.when_pressed(A, ToggleFlightCommand(drone))
-    controller.when_pressed(X, TakeoffCommand(drone, True))
-    controller.when_pressed(B, RotateCommand(drone, 90))
-    controller.when_pressed(LEFT_THUMB, ResetHeadingCommand(drone))
-    controller.when_pressed(DPAD_UP, FlipCommand(drone, FlipFront))
-    controller.when_pressed(DPAD_DOWN, FlipCommand(drone, FlipBack))
-    controller.when_pressed(DPAD_LEFT, FlipCommand(drone, FlipLeft))
-    controller.when_pressed(DPAD_RIGHT, FlipCommand(drone, FlipRight))
-    height = HeightCommand(drone, 121.9, False)
-    controller.while_held(LB, height)
-    controller.when_pressed(BACK, EmergencyCommand(drone))
-    controller.while_held(START, StopCommand(drone))
-    runner.set_default_command(FlyCommand(drone, controller))
+    c = XboxController(0)
+
+    """
+    A (press): Liftoff / Land
+    B (press): Rotate 90
+    Y (press): Throw and go
+    X: Nothing
+    LS (press): Toggle headless
+    RS (hold): Fast mode
+    RS (y): Forward / backward
+    RS (x): Left / right
+    LS (x): Rotate
+    START (hold): Alt mode
+    BACK (press): Stop
+    BACK (double press): Emergency stop
+    LB (hold): Hover 100 cm
+    RB (press): Toggle altitude hold
+    
+    Alt:
+        UP (press): Flip forward
+        DOWN (press): Flip backward
+        LEFT (press): Flip left
+        RIGHT (press): Flip right
+        
+    
+    """
+
+    def is_alt_mode():
+        return c.get_button(START)
+
+    c.when_pressed(A, ToggleFlightCommand(drone))
+    c.when_pressed(Y, TakeoffCommand(drone, True))
+    c.when_pressed(B, RotateCommand(drone, 90))
+    c.when_pressed(DPAD_UP, ConditionalCommand(FlipCommand(drone, FlipFront), None, is_alt_mode))
+    c.when_pressed(DPAD_DOWN, ConditionalCommand(FlipCommand(drone, FlipBack), None, is_alt_mode))
+    c.when_pressed(DPAD_LEFT, ConditionalCommand(FlipCommand(drone, FlipLeft), None, is_alt_mode))
+    c.when_pressed(DPAD_RIGHT, ConditionalCommand(FlipCommand(drone, FlipRight), None, is_alt_mode))
+    c.when_pressed(LEFT_THUMB, ToggleHeadlessCommand(drone))
+    c.while_held(LB, HeightCommand(drone, 100, False))
+    c.when_pressed(RB, ToggleAltitudeHoldCommand(drone))
+    c.when_pressed(BACK, EmergencyCommand(drone))
+    runner.set_default_command(FlyCommand(drone, c))
 
     while True:
         try:

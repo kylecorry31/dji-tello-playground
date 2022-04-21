@@ -79,11 +79,7 @@ class Drone:
     def disconnect(self):
         self.tello.disconnect()
 
-    def fly(self, x, y, z, yaw, field_oriented=False, fast_mode=False):
-        if field_oriented:
-            rotated = rotate((x, y), self.compass.read())
-            x = rotated[0]
-            y = rotated[1]
+    def fly(self, x, y, z, yaw, fast_mode=False):
         if fast_mode or self.__was_fast_mode:
             self.tello.stick(x, y, z, yaw, fast_mode)
         else:

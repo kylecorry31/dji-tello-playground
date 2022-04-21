@@ -1,5 +1,8 @@
 from controller.xbox_controller import *
 from drone.drone import Drone
+from drone.modules.altitude_hold_module import AltitudeHoldModule
+from drone.modules.headless_module import HeadlessModule
+from drone.modules.speed_limit_module import SpeedLimitModule
 from filter.pid import PID
 
 
@@ -9,53 +12,41 @@ class FlyCommand(Command):
         super().__init__(drone)
         self.drone = drone
         self.controller = controller
-        self.x_speed = 1.0
-        self.y_speed = 1.0
-        self.z_speed = 1.0
-        self.yaw_speed = 1.0
-        self.is_field_oriented = False
         self.last_thumb = False
-        self.maintain_height = None
-        self.maintain_pid = PID(0.03, 0.0, 0.05)
-        self.last_time = None
+        self.headless_module = HeadlessModule(self.drone.compass)
+        self.headless_module.is_enabled = False
+        self.altitude_hold_module = AltitudeHoldModule(self.drone.altimeter)
+        self.speed_limit_module = SpeedLimitModule(1.0, True)
 
     def initialize(self):
-        self.maintain_pid.reset()
-        self.maintain_height = None
-        self.last_time = time.time()
+        self.headless_module.reset()
+        self.altitude_hold_module.reset()
+        self.speed_limit_module.reset()
 
     def execute(self):
-        self.update_field_orientation()
-        z = self.get_z()
-        x = self.controller.get_x(RIGHT_STICK) * self.x_speed
-        y = self.controller.get_y(RIGHT_STICK) * self.y_speed
-        yaw = self.controller.get_x(LEFT_STICK) * self.yaw_speed
+        self.__update_headless()
+        z = self.controller.get_trigger(RT) - self.controller.get_trigger(LT)
+        x = self.controller.get_x(RIGHT_STICK)
+        y = self.controller.get_y(RIGHT_STICK)
+        yaw = self.controller.get_x(LEFT_STICK)
         fast_mode = self.controller.get_button(RIGHT_THUMB)
-        self.last_time = time.time()
-        self.drone.fly(x, y, z, yaw, self.is_field_oriented, fast_mode)
+        self.drone.fly(x, y, z, yaw, fast_mode)
 
-    def get_z(self):
-        dt = time.time() - self.last_time
-        user = (self.controller.get_trigger(RT) - self.controller.get_trigger(LT)) * self.z_speed
+    def __fly(self, x: float, y: float, z: float, yaw: float, fast_mode: bool):
+        modules = [self.headless_module, self.altitude_hold_module, self.speed_limit_module]
+        for module in modules:
+            if module.is_enabled:
+                (x, y, z, yaw, fast_mode) = module.run(x, y, z, yaw, fast_mode)
+        self.drone.fly(x, y, z, yaw, fast_mode)
 
-        # If the user is not moving, maintain the height
-        if abs(user) < 0.1 and self.maintain_height is not None:
-            return self.maintain_pid.calculate(self.drone.altimeter.read(), self.maintain_height, dt)
-
-        # If the user is moving up/down, set the new maintain height
-        self.maintain_height = self.drone.altimeter.read()
-
-        # Don't maintain height if it is too high or low
-        if self.maintain_height <= 10 or self.maintain_height > 1000:
-            self.maintain_height = None
-
-        return user
-
-    def update_field_orientation(self):
+    def __update_headless(self):
         thumb = self.controller.get_button(LEFT_THUMB)
         if thumb != self.last_thumb and thumb:
-            self.is_field_oriented = not self.is_field_oriented
-            print("Field oriented?:", self.is_field_oriented)
+            was_enabled = self.headless_module.is_enabled
+            self.headless_module.is_enabled = not was_enabled
+            if not was_enabled:
+                self.headless_module.reset()
+            print("Headless?:", self.headless_module.is_enabled)
         self.last_thumb = thumb
 
     def is_finished(self):

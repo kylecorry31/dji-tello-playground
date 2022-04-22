@@ -1,4 +1,5 @@
 import socket
+import time
 from threading import Thread
 import libh264decoder
 import numpy as np
@@ -20,7 +21,11 @@ def _receive_video_thread():
             # end of frame
             if len(res_string) != 1460:
                 for f in _h264_decode(packet_data):
-                    frame = cv2.cvtColor(f, cv2.COLOR_RGB2BGR)
+                    frame = f#cv2.cvtColor(f, cv2.COLOR_RGB2BGR)
+                if frame is not None:
+                    # print len(frame)
+                    print frame,
+                    pass
                 packet_data = ""
 
         except socket.error as exc:
@@ -33,9 +38,10 @@ def _h264_decode(packet_data):
     for framedata in frames:
         (f, w, h, ls) = framedata
         if f is not None:
-            f = np.fromstring(f, dtype=np.ubyte, count=len(f), sep='')
-            f = (f.reshape((h, ls / 3, 3)))
-            f = f[:, :w, :]
+            # print(h)
+            # f = np.fromstring(f, dtype=np.ubyte, count=len(f), sep='')
+            # f = (f.reshape((h, ls / 3, 3)))
+            # f = f[:, :w, :]
             res_frame_list.append(f)
 
     return res_frame_list
@@ -46,11 +52,14 @@ receive_video_thread.daemon = True
 receive_video_thread.start()
 
 while True:
-    try:
-        f = frame
-        if f is not None:
-            cv2.imshow("Tello", f)
-        if cv2.waitKey(1) & 0xFF == ord('x'):
-            break
-    except Exception as e:
-        pass
+    time.sleep(0.1)
+
+# while True:
+#     try:
+#         f = frame
+#         if f is not None:
+#             cv2.imshow("Tello", f)
+#         if cv2.waitKey(1) & 0xFF == ord('x'):
+#             break
+#     except Exception as e:
+#         pass

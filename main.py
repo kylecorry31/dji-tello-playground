@@ -24,9 +24,10 @@ sys.excepthook = exception_handler
 drone = Drone()
 runner = CommandRunner.get_instance()
 
+from video import video2
 
 def init():
-    runner.schedule(ShowVideoCommand(drone))
+    # runner.schedule(ShowVideoCommand(drone))
     runner.schedule(ValueDisplayCommand(drone))
     runner.schedule(SensorUpdateCommand(drone))
 

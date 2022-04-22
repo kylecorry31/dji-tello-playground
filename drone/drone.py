@@ -16,7 +16,7 @@ from drone.sensors.tof import TOF
 
 class Drone:
     def __init__(self):
-        self.tello = TelloSDK(print_responses=True)
+        self.tello = TelloSDK(print_responses=False)
         self.tello.command()
         self.tello.set_stream(True)
         self.tello.set_altitude_limit(30)
@@ -40,7 +40,6 @@ class Drone:
         self.speed_limit_module = SpeedLimitModule(1.0, True)
         self.modules = [self.headless_module, self.altitude_hold_module, self.speed_limit_module]
 
-        print(self.get_battery())
         print("READY")
 
     def get_wifi(self, callback=None):

@@ -26,11 +26,11 @@ class ShowVideoCommand(Command):
         cv2.destroyWindow("Tello")
 
     def is_finished(self):
-        return False
+        return not self.__running
 
     def __display(self):
         while self.__running:
-            frame = self.camera.frame
+            frame = self.camera.get_frame()
             if frame is not None:
                 cv2.imshow("Tello", frame)
-            cv2.waitKey(100)
+            cv2.waitKey(1)

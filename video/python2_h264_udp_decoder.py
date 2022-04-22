@@ -2,6 +2,7 @@ import socket
 import time
 from threading import Thread
 import libh264decoder
+from sys import stdout
 
 decoder = libh264decoder.H264Decoder()
 socket_video = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -21,11 +22,11 @@ def _receive_video_thread():
                 for f in _h264_decode(packet_data):
                     frame = f
                 if frame is not None:
-                    print frame,
+                    stdout.write(frame)
+                    stdout.flush()
                 packet_data = ""
-
-        except socket.error as exc:
-            print("Caught exception socket.error : %s" % exc)
+        except:
+            pass
 
 
 def _h264_decode(packet_data):

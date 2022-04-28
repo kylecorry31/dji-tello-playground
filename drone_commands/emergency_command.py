@@ -1,11 +1,11 @@
 import time
 
 from commands import Command
-from drone.drone import Drone
+from drone.tello import Tello
 
 
 class EmergencyCommand(Command):
-    def __init__(self, drone: Drone):
+    def __init__(self, drone: Tello):
         super().__init__(drone)
         self.drone = drone
         self.last_activate = None

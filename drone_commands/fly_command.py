@@ -1,10 +1,10 @@
 from controller.xbox_controller import *
-from drone.drone import Drone
+from drone.tello import Tello
 
 
 class FlyCommand(Command):
 
-    def __init__(self, drone: Drone, controller: XboxController):
+    def __init__(self, drone: Tello, controller: XboxController):
         super().__init__(drone)
         self.drone = drone
         self.controller = controller

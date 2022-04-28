@@ -14,7 +14,7 @@ from drone.sensors.mvo_position_sensor import MVOPositionSensor
 from drone.sensors.tof import TOF
 
 
-class Drone:
+class Tello:
     def __init__(self):
         self.tello = TelloSDK(print_responses=False)
         self.tello.command()

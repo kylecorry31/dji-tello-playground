@@ -1,9 +1,9 @@
 from controller.xbox_controller import *
-from drone.drone import Drone
+from drone.tello import Tello
 from drone_commands import *
 from drone_commands.emergency_command import EmergencyCommand
 
-drone = Drone()
+drone = Tello()
 runner = CommandRunner.get_instance()
 runner.schedule(ShowVideoCommand(drone))
 

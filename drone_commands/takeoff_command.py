@@ -1,10 +1,10 @@
 from commands.command import Command
-from drone.drone import Drone
+from drone.tello import Tello
 
 
 class TakeoffCommand(Command):
 
-    def __init__(self, drone: Drone, throw: bool = False):
+    def __init__(self, drone: Tello, throw: bool = False):
         super().__init__(drone)
         self.drone = drone
         self.throw = throw

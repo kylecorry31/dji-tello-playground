@@ -1,7 +1,5 @@
 from drone_commands.flip_command import FlipCommand
 from drone_commands.fly_command import FlyCommand
-from drone_commands.auto_test_command import AutoTestCommand
-from drone_commands.fly_to_command import FlyToCommand
 from drone_commands.height_command import HeightCommand
 from drone_commands.land_command import LandCommand
 from drone_commands.rotate_command import RotateCommand
@@ -15,9 +13,7 @@ FlipCommand = FlipCommand
 StopCommand = StopCommand
 ToggleFlightCommand = ToggleFlightCommand
 ShowVideoCommand = ShowVideoCommand
-FlyToCommand = FlyToCommand
 RotateCommand = RotateCommand
 LandCommand = LandCommand
 TakeoffCommand = TakeoffCommand
-AutoTestCommand = AutoTestCommand
 HeightCommand = HeightCommand

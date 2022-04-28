@@ -33,6 +33,9 @@ class FusedAltimeter(Sensor):
         self.filter.last_position = height
 
     def update(self):
+        if self.baseline_baro is None:
+            self.reset()
+
         pos = self.tof.read()
         baro = self.barometer.read()
         vel = -self.mvo.read()[2]

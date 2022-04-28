@@ -1,10 +1,10 @@
 from controller.xbox_controller import *
-from drone.tello import Tello
+from drone.drone import Drone
 
 
 class FlyCommand(Command):
 
-    def __init__(self, drone: Tello, controller: XboxController):
+    def __init__(self, drone: Drone, controller: XboxController):
         super().__init__(drone)
         self.drone = drone
         self.controller = controller
@@ -15,7 +15,7 @@ class FlyCommand(Command):
         y = self.controller.get_y(RIGHT_STICK)
         yaw = self.controller.get_x(LEFT_STICK)
         fast_mode = self.controller.get_button(RIGHT_THUMB)
-        self.drone.fly(x, y, z, yaw, fast_mode, True)
+        self.drone.fly(x, y, z, yaw, fast_mode)
 
     def is_finished(self):
         return False

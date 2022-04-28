@@ -1,11 +1,11 @@
 from commands.PIDCommand import PIDCommand
-from drone.tello import Tello
+from drone.drone import Drone
 from filter.pid import PID
 
 
 class HeightCommand(PIDCommand):
 
-    def __init__(self, drone: Tello, height: float, relative=True):
+    def __init__(self, drone: Drone, height: float, relative=True):
         pid = PID(0.05, 0.01, 0.15)
         pid.position_tolerance = 1
         pid.integrator_range = 10
@@ -16,10 +16,10 @@ class HeightCommand(PIDCommand):
         self.relative = relative
 
     def set_velocity(self, velocity):
-        self.drone.fly(0, 0, velocity, 0)
+        self.drone.fly(0, 0, velocity, 0, False)
 
     def estimate_time(self, error):
         return abs(error) / 65
 
     def get_height(self):
-        return self.drone.altimeter.read()
+        return self.drone.get_altitude()

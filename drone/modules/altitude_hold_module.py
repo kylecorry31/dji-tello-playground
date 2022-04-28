@@ -6,10 +6,10 @@ from filter.pid import PID
 
 
 class AltitudeHoldModule(FlyModule):
-    def __init__(self, altimeter: FusedAltimeter):
+    def __init__(self, altimeter: FusedAltimeter, pid: PID):
         super().__init__()
         self.altimeter = altimeter
-        self.maintain_pid = PID(0.03, 0.0, 0.05)
+        self.maintain_pid = pid
         self.last_time = time.time()
         self.maintain_height = None
 

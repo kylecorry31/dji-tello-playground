@@ -1,112 +1,124 @@
+import threading
 import time
 
 from drone.advanced.tello_sdk import TelloSDK
+from drone.drone import Drone
 from drone.modules.altitude_hold_module import AltitudeHoldModule
 from drone.modules.headless_module import HeadlessModule
-from drone.modules.speed_limit_module import SpeedLimitModule
 from drone.sensors.accelerometer import Accelerometer
 from drone.sensors.barometer import Barometer
 from drone.sensors.compass import Compass
 from drone.sensors.flight_time import FlightTime
 from drone.sensors.fused_altimeter import FusedAltimeter
 from drone.sensors.mvo import MVO
-from drone.sensors.mvo_position_sensor import MVOPositionSensor
 from drone.sensors.tof import TOF
+from filter.pid import PID
+from video.tello_camera import TelloCamera
 
 
-class Tello:
+class Tello(Drone):
     def __init__(self):
-        self.tello = TelloSDK(print_responses=False)
-        self.tello.command()
-        self.tello.set_stream(True)
-        self.tello.set_altitude_limit(30)
-        self.__was_fast_mode = False
-        while not self.tello.has_valid_state():
+        super().__init__()
+        self.__tello = TelloSDK(print_responses=False)
+        self.__tello.command()
+        self.__tello.set_stream(True)
+        self.__tello.set_altitude_limit(30)
+        self.__is_fast_mode = False
+        while not self.__tello.has_valid_state():
             time.sleep(0.1)
-        self.barometer = Barometer(self.tello)
-        self.accelerometer = Accelerometer(self.tello)
-        self.mvo = MVO(self.tello)
-        self.tof = TOF(self.tello)
-        self.flight_time = FlightTime(self.tello)
-        self.compass = Compass(self.tello)
-        self.position = MVOPositionSensor(self.mvo, self.compass)
-        self.altimeter = FusedAltimeter(self.tof, self.barometer, self.mvo, self.accelerometer, self.flight_time)
+        barometer = Barometer(self.__tello)
+        accelerometer = Accelerometer(self.__tello)
+        mvo = MVO(self.__tello)
+        tof = TOF(self.__tello)
+        self.__flight_time = FlightTime(self.__tello)
+        self.__compass = Compass(self.__tello)
+        self.__altimeter = FusedAltimeter(tof, barometer, mvo, accelerometer, self.__flight_time)
+
+        self.__sensors = [
+            barometer,
+            accelerometer,
+            mvo,
+            tof,
+            self.__flight_time,
+            self.__compass,
+            self.__altimeter
+        ]
 
         # Set up modules
-        self.headless_module = HeadlessModule(self.compass)
-        self.headless_module.is_enabled = False
-        self.altitude_hold_module = AltitudeHoldModule(self.altimeter)
-        self.altitude_hold_module.is_enabled = False
-        self.speed_limit_module = SpeedLimitModule(1.0, True)
-        self.modules = [self.headless_module, self.altitude_hold_module, self.speed_limit_module]
+        self.__headless_module = HeadlessModule(self.__compass)
+        self.__headless_module.is_enabled = False
+        self.__altitude_hold_module = AltitudeHoldModule(self.__altimeter, PID(0.03, 0.0, 0.05))
+        self.__altitude_hold_module.is_enabled = False
+        self.__modules = [self.__headless_module, self.__altitude_hold_module]
+
+        self.__camera = TelloCamera()
+        self.__camera.start()
+
+        self.__is_running = True
+        threading.Thread(target=self.__update, daemon=True).start()
 
         print("READY")
 
-    def get_wifi(self, callback=None):
-        return self.tello.read_wifi(callback)
-
     def get_battery(self):
-        return self.tello.get_state().bat
+        return self.__tello.get_state().bat
 
-    def reset_sensors(self):
-        self.compass.reset()
-        self.flight_time.reset()
-        self.barometer.reset()
-        self.accelerometer.reset()
-        self.mvo.reset()
-        self.tof.reset()
-        self.altimeter.reset()
-        self.position.reset()
-        for module in self.modules:
-            module.reset()
+    def __update(self):
+        while self.__is_running:
+            for sensor in self.__sensors:
+                sensor.update()
+            time.sleep(0.01)
 
-    def update_sensors(self):
-        self.compass.update()
-        self.flight_time.update()
-        self.barometer.update()
-        self.accelerometer.update()
-        self.mvo.update()
-        self.tof.update()
-        self.altimeter.update()
-        self.position.update()
+    def land(self):
+        self.__tello.land()
 
-    def land(self, palm: bool = False):
-        if palm:
-            self.tello.palm_land()
-        else:
-            self.tello.land()
-
-    def takeoff(self, throw: bool = False):
-        if throw:
-            self.tello.throw_and_go()
-        else:
-            self.tello.takeoff(True)
+    def takeoff(self):
+        self.__tello.takeoff(False)
 
     def is_flying(self):
-        return self.tello.get_state().h != 0
+        return self.__tello.get_state().h != 0
 
-    def stop(self):
-        self.fly(0, 0, 0, 0)
+    def __del__(self):
+        self.__is_running = False
+        self.__camera.stop()
+        self.__tello.disconnect()
 
-    def disconnect(self):
-        self.tello.disconnect()
-
-    def fly(self, x, y, z, yaw, fast_mode=False, run_modules=False):
-        if run_modules:
-            for module in self.modules:
-                if module.is_enabled:
-                    (x, y, z, yaw, fast_mode) = module.run(x, y, z, yaw, fast_mode)
-        if fast_mode or self.__was_fast_mode:
-            self.tello.stick(x, y, z, yaw, fast_mode)
+    def fly(self, x, y, z, yaw, fast_mode=False):
+        for module in self.__modules:
+            if module.is_enabled:
+                (x, y, z, yaw, fast_mode) = module.run(x, y, z, yaw, fast_mode)
+        if fast_mode or self.__is_fast_mode:
+            self.__tello.stick(x, y, z, yaw, fast_mode)
         else:
-            self.tello.rc(x, y, z, yaw)
-        self.__was_fast_mode = fast_mode
-
-    def go(self, x, y, z, speed, listener=None):
-        self.tello.go(x, y, z, speed, listener)
+            self.__tello.rc(x, y, z, yaw)
+        self.__is_fast_mode = fast_mode
 
     def emergency_stop(self):
-        self.tello.emergency()
+        self.__tello.emergency()
+
+    def get_altitude(self) -> float:
+        return self.__altimeter.read()
+
+    def get_yaw(self) -> float:
+        return self.__compass.read()
+
+    def set_headless(self, is_on: bool):
+        if is_on:
+            self.__headless_module.reset()
+        self.__headless_module.is_enabled = is_on
+
+    def is_headless(self) -> bool:
+        return self.__headless_module.is_enabled
+
+    def is_holding_altitude(self) -> bool:
+        return self.__altitude_hold_module.is_enabled
+
+    def hold_altitude(self, is_on: bool):
+        if is_on:
+            self.__altitude_hold_module.reset()
+        self.__altitude_hold_module.is_enabled = is_on
 
     def flip(self, direction: int):
-        self.tello.flip(direction)
+        self.__tello.flip(direction)
+
+    def get_frame(self):
+        return self.__camera.get_frame()

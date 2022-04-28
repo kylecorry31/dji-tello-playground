@@ -1,15 +1,15 @@
 from commands.command import Command
-from drone.tello import Tello
+from drone.drone import Drone
 
 
 class LandCommand(Command):
 
-    def __init__(self, drone: Tello):
+    def __init__(self, drone: Drone):
         super().__init__(drone)
         self.drone = drone
 
     def execute(self):
-        self.drone.fly(0, 0, -1, 0)
+        self.drone.fly(0, 0, -1, 0, False)
 
     def is_finished(self):
         return not self.drone.is_flying()

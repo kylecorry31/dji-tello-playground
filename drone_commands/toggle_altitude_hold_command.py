@@ -1,17 +1,14 @@
 from commands import Command
+from drone.drone import Drone
 
 
 class ToggleAltitudeHoldCommand(Command):
-    def __init__(self, drone):
+    def __init__(self, drone: Drone):
         super().__init__(None)
         self.drone = drone
 
     def initialize(self):
-        if self.drone.altitude_hold_module.is_enabled:
-            self.drone.altitude_hold_module.is_enabled = False
-        else:
-            self.drone.altitude_hold_module.is_enabled = True
-            self.drone.altitude_hold_module.reset()
+        self.drone.hold_altitude(not self.drone.is_holding_altitude())
 
     def is_finished(self):
         return True

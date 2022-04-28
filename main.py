@@ -2,15 +2,14 @@ import sys
 
 import cv2
 
+from controller.xbox_controller import *
+from drone.advanced.flips import *
 from drone.tello import Tello
 from drone_commands import *
-from controller.xbox_controller import *
 from drone_commands.emergency_command import EmergencyCommand
-from drone_commands.sensor_update_command import SensorUpdateCommand
 from drone_commands.toggle_altitude_hold_command import ToggleAltitudeHoldCommand
 from drone_commands.toggle_headless_command import ToggleHeadlessCommand
 from drone_commands.value_display_command import ValueDisplayCommand
-from drone.advanced.flips import *
 
 
 def exception_handler(exctype, value, tb):
@@ -24,22 +23,11 @@ sys.excepthook = exception_handler
 drone = Tello()
 runner = CommandRunner.get_instance()
 
+
 def init():
-    runner.schedule(ShowVideoCommand())
+    runner.schedule(ShowVideoCommand(drone))
     runner.schedule(ValueDisplayCommand(drone))
-    runner.schedule(SensorUpdateCommand(drone))
-
-
-def autonomous():
-    runner.schedule(AutoTestCommand(drone))
-    while True:
-        try:
-            runner.update()
-            time.sleep(0.01)
-        except KeyboardInterrupt:
-            break
-        except Exception:
-            pass
+    # runner.schedule(SensorUpdateCommand(drone))
 
 
 def teleop():
@@ -74,14 +62,11 @@ def teleop():
         return c.get_button(START)
 
     c.when_pressed(A, ToggleFlightCommand(drone))
-    c.when_pressed(Y, TakeoffCommand(drone, True))
-    c.when_pressed(B, RotateCommand(drone, 90))
     c.when_pressed(DPAD_UP, ConditionalCommand(FlipCommand(drone, FlipFront), None, is_alt_mode))
     c.when_pressed(DPAD_DOWN, ConditionalCommand(FlipCommand(drone, FlipBack), None, is_alt_mode))
     c.when_pressed(DPAD_LEFT, ConditionalCommand(FlipCommand(drone, FlipLeft), None, is_alt_mode))
     c.when_pressed(DPAD_RIGHT, ConditionalCommand(FlipCommand(drone, FlipRight), None, is_alt_mode))
     c.when_pressed(LEFT_THUMB, ToggleHeadlessCommand(drone))
-    c.while_held(LB, HeightCommand(drone, 100, False))
     c.when_pressed(RB, ToggleAltitudeHoldCommand(drone))
     c.when_pressed(BACK, EmergencyCommand(drone))
     runner.set_default_command(FlyCommand(drone, c))
@@ -98,11 +83,9 @@ def teleop():
 
 def end():
     runner.cancel_all(True)
-    drone.disconnect()
     cv2.destroyAllWindows()
 
 
 init()
-# autonomous()
 teleop()
 end()

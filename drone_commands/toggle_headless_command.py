@@ -1,17 +1,14 @@
 from commands import Command
+from drone.drone import Drone
 
 
 class ToggleHeadlessCommand(Command):
-    def __init__(self, drone):
+    def __init__(self, drone: Drone):
         super().__init__(None)
         self.drone = drone
 
     def initialize(self):
-        if self.drone.headless_module.is_enabled:
-            self.drone.headless_module.is_enabled = False
-        else:
-            self.drone.headless_module.is_enabled = True
-            self.drone.headless_module.reset()
+        self.drone.set_headless(not self.drone.is_headless())
 
     def is_finished(self):
         return True

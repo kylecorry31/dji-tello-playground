@@ -2,7 +2,7 @@ import sys
 
 import cv2
 
-from drone.drone import Drone
+from drone.tello import Tello
 from drone_commands import *
 from controller.xbox_controller import *
 from drone_commands.emergency_command import EmergencyCommand
@@ -21,7 +21,7 @@ def exception_handler(exctype, value, tb):
 
 sys.excepthook = exception_handler
 
-drone = Drone()
+drone = Tello()
 runner = CommandRunner.get_instance()
 
 def init():

@@ -1,12 +1,12 @@
 from commands.command import Command
 import time
 
-from drone.drone import Drone
+from drone.tello import Tello
 
 
 class FlipCommand(Command):
 
-    def __init__(self, drone: Drone, direction: int):
+    def __init__(self, drone: Tello, direction: int):
         super().__init__(drone)
         self.drone = drone
         self.start_time = None

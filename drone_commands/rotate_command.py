@@ -1,12 +1,12 @@
 from commands.PIDCommand import PIDCommand
-from drone.drone import Drone
+from drone.tello import Tello
 from filter.pid import PID
 from utils import delta_angle
 
 
 class RotateCommand(PIDCommand):
 
-    def __init__(self, drone: Drone, yaw: float, relative=True):
+    def __init__(self, drone: Tello, yaw: float, relative=True):
         pid = PID(0.05, 0, 0)
         pid.position_tolerance = 1
         pid.error_fn = self.calculate_error

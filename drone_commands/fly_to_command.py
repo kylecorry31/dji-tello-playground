@@ -3,12 +3,12 @@ import math
 from commands.command import Command
 import time
 
-from drone.drone import Drone
+from drone.tello import Tello
 
 
 class FlyToCommand(Command):
 
-    def __init__(self, drone: Drone, x: float, y: float, z: float, speed: float):
+    def __init__(self, drone: Tello, x: float, y: float, z: float, speed: float):
         super().__init__(drone)
         self.drone = drone
         self.start_time = None

@@ -1,6 +1,6 @@
 import threading
 from commands import Command
-from drone.drone import Drone
+from drone.tello import Tello
 from ui import easy_draw
 
 
@@ -9,7 +9,7 @@ def round_places(num, places):
 
 
 class ValueDisplayCommand(Command):
-    def __init__(self, drone: Drone):
+    def __init__(self, drone: Tello):
         super().__init__(None)
         self.drone = drone
         self.thread = None

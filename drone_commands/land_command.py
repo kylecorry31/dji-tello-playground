@@ -1,10 +1,10 @@
 from commands.command import Command
-from drone.drone import Drone
+from drone.tello import Tello
 
 
 class LandCommand(Command):
 
-    def __init__(self, drone: Drone):
+    def __init__(self, drone: Tello):
         super().__init__(drone)
         self.drone = drone
 

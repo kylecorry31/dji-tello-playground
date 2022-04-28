@@ -1,5 +1,5 @@
 from commands import SequentialCommand
-from drone.drone import Drone
+from drone.tello import Tello
 from drone_commands.height_command import HeightCommand
 from drone_commands.land_command import LandCommand
 from drone_commands.takeoff_command import TakeoffCommand
@@ -7,7 +7,7 @@ from drone_commands.takeoff_command import TakeoffCommand
 
 class AutoTestCommand(SequentialCommand):
 
-    def __init__(self, drone: Drone):
+    def __init__(self, drone: Tello):
         super().__init__(
             TakeoffCommand(drone),
             HeightCommand(drone, 100, True),

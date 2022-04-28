@@ -1,12 +1,12 @@
 import math
 
 from commands import Command, CommandRunner
-from drone.drone import Drone
+from drone.tello import Tello
 from drone_commands import RotateCommand
 
 
 class HomeCommand(Command):
-    def __init__(self, drone: Drone):
+    def __init__(self, drone: Tello):
         super().__init__(drone)
         self.drone = drone
 

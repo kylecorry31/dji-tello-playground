@@ -29,7 +29,7 @@ class AlignFaceCommand(PIDCommand):
             img = self.drone.get_image()
             img = cv2.resize(img, (320, 240))
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            faces = self.classifier.detectMultiScale(gray, 1.1, 5)
+            faces = self.classifier.detectMultiScale(gray, 1.1, 9)
             largest_size = 0
             largest_face = None
             for (x, y, w, h) in faces:
@@ -42,6 +42,7 @@ class AlignFaceCommand(PIDCommand):
             pct = (largest_face[0] / 320.0 - 0.5) * 2
             angle = pct * 45  # TODO: Determine actual FOV
             # size = largest_size / (320 * 240.0)
+            # TODO: Allow vertical alignment
             self.target = self.drone.compass.read() + angle
 
     def set_velocity(self, velocity):

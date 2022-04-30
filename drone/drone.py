@@ -12,6 +12,7 @@ from drone.sensors.fused_altimeter import FusedAltimeter
 from drone.sensors.mvo import MVO
 from drone.sensors.mvo_position_sensor import MVOPositionSensor
 from drone.sensors.tof import TOF
+from video.tello_camera import TelloCamera
 
 
 class Drone:
@@ -39,7 +40,8 @@ class Drone:
         self.altitude_hold_module.is_enabled = False
         self.speed_limit_module = SpeedLimitModule(1.0, True)
         self.modules = [self.headless_module, self.altitude_hold_module, self.speed_limit_module]
-
+        self.camera = TelloCamera()
+        self.camera.start()
         print("READY")
 
     def get_wifi(self, callback=None):
@@ -90,6 +92,7 @@ class Drone:
 
     def disconnect(self):
         self.tello.disconnect()
+        self.camera.stop()
 
     def fly(self, x, y, z, yaw, fast_mode=False, run_modules=False):
         if run_modules:
@@ -110,3 +113,6 @@ class Drone:
 
     def flip(self, direction: int):
         self.tello.flip(direction)
+
+    def get_image(self):
+        return self.camera.get_frame()

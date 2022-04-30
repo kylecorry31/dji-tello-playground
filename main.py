@@ -5,6 +5,7 @@ import cv2
 from drone.drone import Drone
 from drone_commands import *
 from controller.xbox_controller import *
+from drone_commands.align_face import AlignFaceCommand
 from drone_commands.emergency_command import EmergencyCommand
 from drone_commands.sensor_update_command import SensorUpdateCommand
 from drone_commands.toggle_altitude_hold_command import ToggleAltitudeHoldCommand
@@ -24,8 +25,9 @@ sys.excepthook = exception_handler
 drone = Drone()
 runner = CommandRunner.get_instance()
 
+
 def init():
-    runner.schedule(ShowVideoCommand())
+    runner.schedule(ShowVideoCommand(drone))
     runner.schedule(ValueDisplayCommand(drone))
     runner.schedule(SensorUpdateCommand(drone))
 
@@ -58,7 +60,7 @@ def teleop():
     START (hold): Alt mode
     BACK (press): Stop
     BACK (double press): Emergency stop
-    LB (hold): Hover 100 cm
+    LB (hold): Align face
     RB (press): Toggle altitude hold
     
     Alt:
@@ -81,7 +83,7 @@ def teleop():
     c.when_pressed(DPAD_LEFT, ConditionalCommand(FlipCommand(drone, FlipLeft), None, is_alt_mode))
     c.when_pressed(DPAD_RIGHT, ConditionalCommand(FlipCommand(drone, FlipRight), None, is_alt_mode))
     c.when_pressed(LEFT_THUMB, ToggleHeadlessCommand(drone))
-    c.while_held(LB, HeightCommand(drone, 100, False))
+    c.while_held(LB, AlignFaceCommand(drone))
     c.when_pressed(RB, ToggleAltitudeHoldCommand(drone))
     c.when_pressed(BACK, EmergencyCommand(drone))
     runner.set_default_command(FlyCommand(drone, c))

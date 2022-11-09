@@ -40,7 +40,7 @@ class AlignFaceCommand(PIDCommand):
             if largest_face is None:
                 continue
             pct = (largest_face[0] / 320.0 - 0.5) * 2
-            angle = pct * 45  # TODO: Determine actual FOV
+            angle = pct * 69.38 / 2  # (Vertical: 51.82 / 2)
             # size = largest_size / (320 * 240.0)
             # TODO: Allow vertical alignment
             self.target = self.drone.compass.read() + angle
